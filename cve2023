@@ -13,6 +13,7 @@ CVE-2023-22809  https://github.com/n3m1dotsys/CVE-2023-22809-sudoedit-privesc   
 
 web
 Joomla 未授权访问漏洞 CVE-2023-23752
+Weblogic CVE-2023-21839 RCE 
 
 other
 CVE-2022-44268 https://github.com/agathanon/cve-2022-44268 ImageMagick
