@@ -11,6 +11,9 @@ linux lpe
 CVE-2023-22809  https://github.com/n3m1dotsys/CVE-2023-22809-sudoedit-privesc   sudo 1.8.0 to 1.9.12p1
 
 
+web
+Joomla 未授权访问漏洞 CVE-2023-23752
+
 other
 CVE-2022-44268 https://github.com/agathanon/cve-2022-44268 ImageMagick
 cve-2022-31705 https://github.com/s0duku/cve-2022-31705 windows vmware workstation 16.2.0
