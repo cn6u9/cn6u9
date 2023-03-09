@@ -1,4 +1,7 @@
 windows lpe
+CVE-2023–21746  https://github.com/blackarrowsec/redteam-research/tree/master/LPE%20via%20StorSvc LPE via StorSvc
+CVE-2023-21768 https://github.com/chompie1337/Windows_LPE_AFD_CVE-2023-21768 Windows 11 22H2 systems
+
 
 linux lpe
 CVE-2023-22809  https://github.com/n3m1dotsys/CVE-2023-22809-sudoedit-privesc   sudo 1.8.0 to 1.9.12p1
@@ -6,3 +9,6 @@ CVE-2023-22809  https://github.com/n3m1dotsys/CVE-2023-22809-sudoedit-privesc   
 
 other
 CVE-2022-44268 https://github.com/agathanon/cve-2022-44268 ImageMagick
+cve-2022-31705 https://github.com/s0duku/cve-2022-31705 windows vmware workstation 16.2.0
+
+CVE-2022-26923 域提权
