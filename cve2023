@@ -3,6 +3,10 @@ CVE-2023–21746  https://github.com/blackarrowsec/redteam-research/tree/master/
 CVE-2023-21768 https://github.com/chompie1337/Windows_LPE_AFD_CVE-2023-21768 Windows 11 22H2 systems
 
 
+word
+CVE_2023_21716 https://github.com/Xnuvers007/CVE-2023-21716    RTF Crash POC
+
+
 linux lpe
 CVE-2023-22809  https://github.com/n3m1dotsys/CVE-2023-22809-sudoedit-privesc   sudo 1.8.0 to 1.9.12p1
 
