@@ -8,6 +8,40 @@ chmod +x myvps.sh
 ./myvps.sh
 
 ```
+### Client
+```
+{
+    "run_type": "client",
+    "local_addr": "127.0.0.1",
+    "local_port": 1086,
+    "remote_addr": "1.baidu.org",
+    "remote_port": 444,
+    "password": [
+        "pass"
+    ],
+    "ssl": {
+        "sni": "1.baidu.org"
+    },
+    "mux" :{
+        "enabled": true
+    },
+    "router":{
+        "enabled": true,
+        "bypass": [
+            "geoip:cn",
+            "geoip:private",
+            "geosite:cn",
+            "geosite:geolocation-cn"
+        ],
+        "block": [
+            "geosite:category-ads"
+        ],
+        "proxy": [
+            "geosite:geolocation-!cn"
+        ]
+    }
+}
+```
 ### Enable BBR
 ```
 wget -N --no-check-certificate "https://raw.githubusercontent.com/chiakge/Linux-NetSpeed/master/tcp.sh"
