@@ -65,7 +65,7 @@ EOF
     sleep 3
     rm -rf /usr/share/nginx/html/*
     cd /usr/share/nginx/html/
-    wget https://github.com/cn6u9/cn6u9/trojan/fakesite.zip
+    wget https://github.com/cn6u9/cn6u9/raw/main/trojan/fakesite.zip
     unzip fakesite.zip
     sleep 5
     if [ ! -d "/usr/src" ]; then
