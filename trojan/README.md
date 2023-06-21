@@ -1,4 +1,4 @@
-# trojan-go install and  shadowsocks-libev install
+# trojan-go install and  ss-libev install
 
 
 ### Usage
