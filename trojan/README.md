@@ -1,4 +1,4 @@
-# trojan-go install and  ss-libev install
+# myvps
 
 
 ### Usage
