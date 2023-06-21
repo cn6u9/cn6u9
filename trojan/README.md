@@ -23,7 +23,7 @@ chmod +x myvps.sh
         "sni": "1.baidu.org"
     },
     "mux" :{
-        "enabled": true
+        "enabled": false
     },
     "router":{
         "enabled": true,
