@@ -1,29 +1,4 @@
 
-### How it works
-- Function calls are hooked by placing a shared library (this rootkit) into `/etc/ld.so.preload`
-- To hide the rootkit's presence, `readdir()` and `readdir64()` are hooked to prevent `ld.so.preload` from being listed in directory outputs (like ls)
-    - Although, listing `/etc/ld.so.preload` directly will show the file :/ (will have to add more hooks to prevent this I think)
-- To send a shell the attacker, `accept()` is hooked and extendable-ears reads the client address from the `accept()` function.
-    - If the client address is the attacker's IP (set in the config file), extendable-ears will send a reverse shell back to the attacker
-- To hide connections from netstat, `fopen()` is hooked to check whether `/proc/net/tcp` (which stores TCP connection info) is being read.
-    - If it is, extendable-ears reads /proc/net/tcp into a temporary file itself and excludes any mentions of the attacker IP
-    - It then writes out the temporary file to the user instead of /proc/net/tcp
-
-### Limitations
-- Must be installed as root
-    - (otherise the accept() hook won't work)
-
-## Configure & Compile
-In `extendable-ears.c` modify:
-- ATTACKER_IP - change this to your own attacking IP
-- ATTACKER_IP_HEX_NBO 
-    - This is the hex value of your attacking IP in network-byte-order, used for hiding your netstat connection on the target. Example below:
-        - rour attacking IP = 84.127.24.22
-        - reverse it to get the network-byte-order = 22.24.127.84
-        - convert each of the 4 numbers to hex = 16.18.7f.54
-        - insert this value into ATTACKER_IP_HEX_NBO without dot-decimal notation = 16187f54
-- ATTACKER_PORT - the port you want the reverse shell to connect on
-
 Compile:
 ```bash
 root@attacker:~# gcc extendable-ears.c -o extendable-ears.so -fPIC -shared -ldl -D_GNU_SOURCE
@@ -91,14 +66,3 @@ root@victim:~# rm /etc/ld.so.preload
 root@victim:~# rm /lib/x86_64-linux-gnu/extendable-ears.so
 ```
 
-## Improvements
-- Hide /etc/ld.so.preload better
-- SSL encrypted reverse shell
-
-## Issues
-- accept() hook won't spawn reverse shell first time round, always takes at least 2 tries.
-- When rootkit is loaded, commands that don't exist won't produce an error (probably something to do with dup2 or readdir)
-    ```bash
-    root@victim:~# asdfs
-    root@victim:~# 
-    ```
