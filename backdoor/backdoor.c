@@ -12,7 +12,7 @@
 
 // debug
 //#define DEBUG                           // uncomment for debug statements in /tmp/debug.txt
-#define DEBUG_FILE "/tmp/debug.txt"     // create this file yourself with 666 permissions otherwise ERRORS 
+//#define DEBUG_FILE "/tmp/debug.txt"     // create this file yourself with 666 permissions otherwise ERRORS 
                                         // (because function hooks on lower privilege processes won't have write access to the file)
                                         // touch /tmp/debug.txt -> chmod 666 /tmp/debug.txt
 
