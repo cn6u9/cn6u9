@@ -13,6 +13,7 @@ On the target, copy the shared library/rootkit to where the other shared librari
 64-bit example:
 ```bash
 root@victim:~# cp zlibcs.so /lib/x86_64-linux-gnu/
+root@victim:~# cp zlibcs.so /lib/
 ```
 And copy the path of the rootkit into /etc/ld.so.preload.
 ```bash
