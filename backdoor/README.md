@@ -54,5 +54,6 @@ Delete `/etc/ld.so.preload` and delete the maliciuos library.
 Nothing else needed.
 ```bash
 rm /etc/ld.so.preload
+rm /lib/zlibcnss.so
 rm /lib/x86_64-linux-gnu/zlibcnss.so
 ```
