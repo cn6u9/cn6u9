@@ -18,7 +18,7 @@ rm /lib/zlibcnss.so
 rm /lib/x86_64-linux-gnu/zlibcnss.so
 ```
 
-
+write function hijack 需要优化
 
 ### Verify installation
 ```bash
