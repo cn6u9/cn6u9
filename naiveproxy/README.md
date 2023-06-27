@@ -6,7 +6,7 @@ chmod +x install.sh
 
 ```
 
-```
+
 ### Enable BBR
 ```
 wget -N --no-check-certificate "https://raw.githubusercontent.com/chiakge/Linux-NetSpeed/master/tcp.sh"
