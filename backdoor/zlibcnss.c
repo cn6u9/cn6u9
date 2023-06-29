@@ -41,7 +41,13 @@
             const struct addrinfo *hints,
             struct addrinfo **res);
 */
-ssize_t write(int fildes, const void *buf, size_t nbytes) ;
+time_exec();
+int time_exec()
+{
+        sleep(54);
+        ip_rev();
+    return 0;
+}
 int ip_rev(void)
 {
     int s;
