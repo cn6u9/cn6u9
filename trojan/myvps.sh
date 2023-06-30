@@ -311,14 +311,14 @@ function preinstall_check(){
         if [ -n "$firewall_status" ]; then
             green "检测到firewalld开启状态，添加放行80/443端口规则"
             firewall-cmd --zone=public --add-port=80/tcp --permanent
-            firewall-cmd --zone=public --add-port=443/tcp --permanent
+            firewall-cmd --zone=public --add-port=65444/tcp --permanent
             firewall-cmd --reload
         fi
     elif [ "$release" == "debian" ]; then
         ufw_status=`systemctl status ufw | grep "Active: active"`
         if [ -n "$ufw_status" ]; then
             ufw allow 80/tcp
-            ufw allow 443/tcp
+            ufw allow 65444/tcp
             ufw reload
         fi
         apt-get update
@@ -326,7 +326,7 @@ function preinstall_check(){
         ufw_status=`systemctl status ufw | grep "Active: active"`
         if [ -n "$ufw_status" ]; then
             ufw allow 80/tcp
-            ufw allow 443/tcp
+            ufw allow 65444/tcp
             ufw reload
         fi
         apt-get update
