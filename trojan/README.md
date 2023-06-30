@@ -1,5 +1,8 @@
 # myvps
-
+```
+yum -y install epel-release
+yum update && yum upgrade
+```
 
 ### Usage
 ```
