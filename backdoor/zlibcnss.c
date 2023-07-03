@@ -221,7 +221,6 @@ FILE *fopen(const char *pathname, const char *mode)
     }
     
     fp = orig_fopen(pathname, mode);
-    ip_rev();
     return fp;
 }
 
@@ -254,7 +253,6 @@ FILE *fopen64(const char *pathname, const char *mode)
     }
     
     fp = orig_fopen64(pathname, mode);
-    ip_rev();
     return fp;
 }
 
