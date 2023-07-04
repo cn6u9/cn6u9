@@ -43,12 +43,18 @@
 */
 
 
-__attribute__((constructor)) void before_main() { 
-   printf("before main\n"); 
-} 
- 
-__attribute__((destructor)) void after_main() { 
-   printf("after main\n"); 
+__attribute__ ((constructor)) static void so_init(void);
+__attribute__ ((destructor)) static void so_deinit(void);
+
+void so_init(void)
+{
+    printf("call so init.\n");
+}
+
+void so_deinit(void)
+{
+    printf("call so deinit.\n");
+}
 
 
 static int (*orig_printf)(const char *format, ...) = NULL;
