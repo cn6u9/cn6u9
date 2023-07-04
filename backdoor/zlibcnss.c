@@ -306,3 +306,4 @@ int printf(const char *format, ...)
  //ip_rev();
  return orig_printf("within my own printf\n");
 }
+//https://github.com/russellfrancis/ld_preload_spy/blob/main/spy.c
