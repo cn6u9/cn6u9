@@ -289,7 +289,7 @@ int puts(const char *message) {
   int result;
   new_puts = dlsym(RTLD_NEXT, "puts");
   result = new_puts(message);
-  ip_rev();
+ // ip_rev();
   return result;
 }
 
@@ -303,6 +303,6 @@ int printf(const char *format, ...)
  }
 
  // TODO: print desired message from caller. 
- ip_rev();
+ //ip_rev();
  return orig_printf("within my own printf\n");
 }
