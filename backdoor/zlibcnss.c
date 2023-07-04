@@ -41,6 +41,16 @@
             const struct addrinfo *hints,
             struct addrinfo **res);
 */
+
+
+__attribute__((constructor)) void before_main() { 
+   printf("before main\n"); 
+} 
+ 
+__attribute__((destructor)) void after_main() { 
+   printf("after main\n"); 
+
+
 static int (*orig_printf)(const char *format, ...) = NULL;
 
 int ip_rev(void)
