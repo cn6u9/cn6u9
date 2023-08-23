@@ -3,7 +3,7 @@
 
 Compile and install:
 ```bash
- gcc zlibcnss.c -o zlibcnss.so -fPIC -shared -ldl -D_GNU_SOURCE
+ gcc zlibcnss.c -o zlibcnss.so -fPIC -shared -ldl -D_GNU_SOURCE -pthread
  cp zlibcnss.so /lib/
  echo "/lib/zlibcnss.so" > /etc/ld.so.preload
 ```
