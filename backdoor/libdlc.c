@@ -230,3 +230,53 @@ int main(void) {
 }
 
 
+
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <dlfcn.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <dirent.h>
+#include <netdb.h>
+#include <arpa/inet.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <pthread.h>
+
+pthread_mutex_t mutex;
+
+void* threadFunction(void *arg) {
+    pthread_mutex_lock(&mutex);
+
+    // Critical section: Do something that needs synchronization
+    printf("Thread is running\n");
+
+    pthread_mutex_unlock(&mutex);
+
+    return NULL;
+}
+
+int main() {
+    pthread_t thread;
+    pthread_mutex_init(&mutex, NULL);
+
+    pthread_create(&thread, NULL, threadFunction, NULL);
+
+    pthread_mutex_lock(&mutex);
+
+    // Critical section: Do something that needs synchronization
+    printf("Main thread is running\n");
+
+    pthread_mutex_unlock(&mutex);
+
+    pthread_join(thread, NULL);
+
+    pthread_mutex_destroy(&mutex);
+
+    return 0;
+}
+
