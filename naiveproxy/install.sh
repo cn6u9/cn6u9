@@ -240,6 +240,7 @@ domain_check() {
 
 install_go() {
     #cd /opt
+    ls
     #rm /opt/go1.19.linux-amd64.tar.gz -rf
     #wget https://go.dev/dl/go1.19.linux-amd64.tar.gz
     #tar -zxf go1.19.linux-amd64.tar.gz -C /usr/local/
