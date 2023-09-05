@@ -239,16 +239,16 @@ domain_check() {
 }
 
 install_go() {
-    cd /opt
-    rm /opt/go1.19.linux-amd64.tar.gz -rf
-    wget https://go.dev/dl/go1.19.linux-amd64.tar.gz
-    tar -zxf go1.19.linux-amd64.tar.gz -C /usr/local/
-    echo export GOROOT=/usr/local/go >> /etc/profile
-    echo export PATH=$GOROOT/bin:$PATH >> /etc/profile
-    source /etc/profile
-    export GOROOT=/usr/local/go
-    export PATH=$GOROOT/bin:$PATH
-    go version
+    #cd /opt
+    #rm /opt/go1.19.linux-amd64.tar.gz -rf
+    #wget https://go.dev/dl/go1.19.linux-amd64.tar.gz
+    #tar -zxf go1.19.linux-amd64.tar.gz -C /usr/local/
+    #echo export GOROOT=/usr/local/go >> /etc/profile
+    #echo export PATH=$GOROOT/bin:$PATH >> /etc/profile
+    #source /etc/profile
+    #export GOROOT=/usr/local/go
+    #export PATH=$GOROOT/bin:$PATH
+    #go version
 }
 
 install_caddy() {
