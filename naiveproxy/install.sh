@@ -253,13 +253,17 @@ install_go() {
 
 install_caddy() {
     # download caddy file then install
-    mkdir /root/src && cd /root/src/
-    go install github.com/caddyserver/xcaddy/cmd/xcaddy@latest
-    ~/go/bin/xcaddy build --with github.com/caddyserver/forwardproxy@caddy2=github.com/klzgrad/forwardproxy@naive
-    cp caddy /usr/bin/
-    /usr/bin/caddy version        # 2022-4-8 23:09
+    #mkdir /root/src && cd /root/src/
+    #go install github.com/caddyserver/xcaddy/cmd/xcaddy@latest
+    #~/go/bin/xcaddy build --with github.com/caddyserver/forwardproxy@caddy2=github.com/klzgrad/forwardproxy@naive
+    #cp caddy /usr/bin/
+    #/usr/bin/caddy version        # 2022-4-8 23:09
     #v2.4.6 h1:HGkGICFGvyrodcqOOclHKfvJC0qTU7vny/7FhYp9hNw=  
-    setcap cap_net_bind_service=+ep /usr/bin/caddy  # 设置bind权限，可443
+    #setcap cap_net_bind_service=+ep /usr/bin/caddy  # 设置bind权限，可443
+    wget https://github.com/klzgrad/forwardproxy/releases/download/v2.7.4-caddy2-naive/caddy-forwardproxy-naive.tar.xz
+    tar -xf caddy-forwardproxy-naive.tar.xz
+    cd caddy-forwardproxy-naive
+    cp caddy /usr/bin/
 }
 
 
