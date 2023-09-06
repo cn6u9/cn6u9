@@ -1,5 +1,5 @@
 
-# myvps
+# 
 ```
 yum -y install epel-release
 yum update && yum upgrade
@@ -7,7 +7,7 @@ yum update && yum upgrade
 
 ### Usage
 ```
-bash <(curl -fsSL https://raw.githubusercontent.com/deathline94/Hysteria-Installer/main/hysteria.sh)
+bash <(curl -fsSL https://raw.githubusercontent.com/cn6u9/cn6u9/main/hysteria2/hysteria.sh)
 
 ```
 ### Enable BBR
