@@ -22,15 +22,7 @@ wget -N --no-check-certificate https://raw.githubusercontent.com/cn6u9/cn6u9/mai
 ```
 
 ```
-wget https://ftp.gnu.org/gnu/glibc/glibc-2.25.tar.gz
-tar -xvzf glibc-2.25.tar.gz
-cd glibc-2.25/
-mkdir build
-cd build/
-../configure --prefix=/opt/local/glibc-2.25/
-make -j8
-make install
+https://wrlog.cn/2022/10/1281/
 
-export LD_LIBRARY_PATH=/opt/local/glibc-2.25/lib
-${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}
+
 ```
