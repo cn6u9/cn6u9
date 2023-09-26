@@ -10,6 +10,10 @@ yum update && yum upgrade
 bash <(curl -fsSL https://raw.githubusercontent.com/cn6u9/cn6u9/main/hysteria2/hysteria.sh)
 
 ```
+### Usage
+```
+wget -N --no-check-certificate https://raw.githubusercontent.com/cn6u9/cn6u9/main/hysteria2/tuic.sh && bash tuic.sh
+```
 ### Enable BBR
 ```
  wget -N --no-check-certificate "https://raw.githubusercontent.com/chiakge/Linux-NetSpeed/master/tcp.sh"
