@@ -10,7 +10,7 @@ yum update && yum upgrade
 bash <(curl -fsSL https://raw.githubusercontent.com/cn6u9/cn6u9/main/hysteria2/hysteria.sh)
 
 ```
-### Usage
+### Usage tuic 需要glibc 2.21以上
 ```
 wget -N --no-check-certificate https://raw.githubusercontent.com/cn6u9/cn6u9/main/hysteria2/tuic.sh && bash tuic.sh
 ```
