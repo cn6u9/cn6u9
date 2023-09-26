@@ -23,7 +23,7 @@ wget -N --no-check-certificate https://raw.githubusercontent.com/cn6u9/cn6u9/mai
 ```
 
 ```
-#https://wrlog.cn/2022/10/1281/
+#aHR0cHM6Ly93cmxvZy5jbi8yMDIyLzEwLzEyODEv
 yum install centos-release-scl -y
 yum install -y devtoolset-8-gcc devtoolset-8-gcc-c++ devtoolset-8-binutils 
 echo "source /opt/rh/devtoolset-8/enable" >> /etc/profile 
