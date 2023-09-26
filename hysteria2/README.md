@@ -43,10 +43,11 @@ ln -sv /usr/local/make/bin/make /usr/bin/make
 
 wget https://ftp.gnu.org/gnu/glibc/glibc-2.28.tar.gz 
 tar -xzvf glibc-2.28.tar.gz 
-cd glibc-2.28 
+cd glibc-2.28
+mkdir build && cd build 
 cd /root/glibc-2.28/build 
 yum install bison -y
-./configure --prefix=/usr --disable-profile --enable-add-ons --with-headers=/usr/include --with-binutils=/usr/bin 
+../configure --prefix=/usr --disable-profile --enable-add-ons --with-headers=/usr/include --with-binutils=/usr/bin 
 make 
 make install
 
