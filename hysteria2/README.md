@@ -67,6 +67,19 @@ yum install bison -y
 make 
 make install
 
+```
+
+```
+firewall-cmd --zone=public --add-port=65333/tcp --permanent
+firewall-cmd --zone=public --add-port=65111/udp --permanent
+
+firewall-cmd --reload
+systemctl start firewalld
+systemctl enable firewalld
+
+systemctl stop firewalld
+systemctl disable firewall
 
 
 ```
+
