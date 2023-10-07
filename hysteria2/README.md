@@ -79,7 +79,7 @@ systemctl enable firewalld
 
 systemctl stop firewalld
 systemctl disable firewall
-
-
 ```
-
+```
+0 2 * * * /sbin/reboot
+```
