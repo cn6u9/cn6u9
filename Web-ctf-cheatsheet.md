@@ -1947,7 +1947,7 @@ HQL injection example (pwn2win 2017)
 
 
 #php伪协议
-
+```
 file:// — 访问本地文件系统
 http:// — 访问 HTTP(s) 网址
 https://
@@ -1970,13 +1970,7 @@ ssh2:// — Secure Shell 2
 rar:// — RAR
 ogg:// — 音频流
 expect:// — 处理交互式的流
-
-
-
-作者：转账到钱包
-链接：https://juejin.cn/post/7163831572158742535
-来源：稀土掘金
-著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。
+```
 
 
 # LFI
