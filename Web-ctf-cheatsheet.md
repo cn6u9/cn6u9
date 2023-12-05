@@ -1953,9 +1953,6 @@ http:// — 访问 HTTP(s) 网址
 https://
 ftp:// — 访问 FTP(s) URLs
 php:// — 访问各个输入/输出流（I/O streams）
-zlib:// — 压缩流
-zip://
-bzip2://
 php://filter
 php://memory
 php://temp
@@ -1963,6 +1960,9 @@ php://fd
 php://output
 php://input
 
+zlib:// — 压缩流
+zip://
+bzip2://
 data:// — 数据（RFC 2397）
 glob:// — 查找匹配的文件路径模式
 phar:// — PHP 归档
