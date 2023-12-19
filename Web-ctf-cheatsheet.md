@@ -5689,6 +5689,9 @@ Php Codz Hacking (http://www.80vul.com/pch/)
 | PCH-003   | [mb_ereg(i)_replace()代码注射漏洞及其延伸出的正则应用安全问题](https://github.com/80vul/phpcodz/blob/master/research/pch-003.md) |
 | PCH-002   | [preg_match(_all)的变量初始化问题](https://github.com/80vul/phpcodz/blob/master/research/pch-002.md) |
 | PCH-001   | [intval()使用不当导致安全漏洞](https://github.com/80vul/phpcodz/blob/master/research/pch-001.md) |
+
+
+
 #php fuzz code 自定义
 ```
 #!php
