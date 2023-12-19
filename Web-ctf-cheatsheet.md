@@ -5747,7 +5747,7 @@ print $i."\r\n";
 }
 ?>
 
-
+枚举出所有php函数并fuzz
 https://xz.aliyun.com/t/6737
 
 https://forum.butian.net/share/443
