@@ -60,8 +60,23 @@ cat <<'EOF' | sudo tee $service_executable > /dev/null
 
 # /path/to/your/actual/service_executable
 
-echo "Hello from start.sh!"
-nohup sh /root/PP/start.sh &
+#!/bin/bash
+
+# Continuously check if the pptt process is running
+while true; do
+  # Check if the process is running
+  if ! pgrep pptter >/dev/null 2>&1; then
+    # If the process is not running, start it
+cd /root// &&  /root//pter -p 88 &
+  fi
+
+  # Sleep for 1 second before checking again
+  sleep 10
+done
+
+# Exit the script
+exit 0
+
 EOF
 
 
