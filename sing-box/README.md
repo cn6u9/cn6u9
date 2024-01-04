@@ -40,4 +40,53 @@ systemctl disable firewall
 0 2 * * * /sbin/reboot
 ```
 
+```
+#!/bin/bash
 
+service_name="my_service"
+
+
+service_description="My Service"
+
+
+service_executable="/opt/start.sh"
+
+
+cat <<'EOF' | sudo tee $service_executable > /dev/null
+#!/bin/bash
+
+
+# /path/to/your/actual/service_executable
+
+echo "Hello from start.sh!"
+nohup sh /root/PP/start.sh &
+EOF
+
+
+sudo chmod +x $service_executable
+
+
+cat <<EOF | sudo tee /etc/systemd/system/$service_name.service > /dev/null
+[Unit]
+Description=$service_description
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=$service_executable
+Restart=always
+
+[Install]
+WantedBy=default.target
+EOF
+
+sudo chmod 644 /etc/systemd/system/$service_name.service
+
+sudo systemctl daemon-reload
+
+sudo systemctl start $service_name
+sudo systemctl enable $service_name
+
+sudo systemctl status $service_name
+
+```
