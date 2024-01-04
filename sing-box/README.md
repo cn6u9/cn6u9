@@ -40,6 +40,8 @@ systemctl disable firewall
 0 2 * * * /sbin/reboot
 ```
 
+
+## 开机启动bash，服务自动创建
 ```
 #!/bin/bash
 
