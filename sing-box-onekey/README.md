@@ -24,7 +24,7 @@ sing-box一键脚本，一键安装多种协议，支持自动安装和手动配
 
 ## 安装方式：
 ```
-bash <(curl -Ls https://raw.githubusercontent.com/vveg26/sing-box-onekey/main/install.sh)
+bash <(curl -Ls https://raw.githubusercontent.com/cn6u9/cn6u9/main/sing-box-onekey/install.sh)
 ```
 之后输入sing-box-onekey就可以调用此脚本
 ### 手动安装
