@@ -54,9 +54,9 @@ DEFAULT_LOG_FILE_SAVE_PATH='/usr/local/sing-box/sing-box.log'
 CLIENT_FILE_PATH='/root/sing-box'
 
 # 远端服务端配置
-REMOTE_SERVER_URL='https://raw.githubusercontent.com/vveg26/sing-box-onekey/main/config/server_config.json'
+REMOTE_SERVER_URL='https://raw.githubusercontent.com/cn6u9/cn6u9/main/sing-box-onekey/config/server_config.json'
 # 远端客户端配置
-REMOTE_CLIENT_URL='https://raw.githubusercontent.com/vveg26/sing-box-onekey/main/config/client_config.json'
+REMOTE_CLIENT_URL='https://raw.githubusercontent.com/cn6u9/cn6u9/main/sing-box-onekey/config/client_config.json'
 #sing-box status define
 declare -r SING_BOX_STATUS_RUNNING=1
 declare -r SING_BOX_STATUS_NOT_RUNNING=0
@@ -100,8 +100,6 @@ show_author_info() {
     echo "作者: $author"
     echo "邮箱: $email"
     echo "网站: $website"
-    echo "油管: https://www.youtube.com/@mianyang"
-    echo "项目地址: https://github.com/vveg26/sing-box-onekey"
     echo "========================================================"
 }
 
@@ -239,7 +237,7 @@ config_check() {
 # 设置启动脚本
 set_as_entrance() {
     if [[ ! -f "${SCRIPT_FILE_PATH}" ]]; then
-        wget --no-check-certificate -O ${SCRIPT_FILE_PATH} https://raw.githubusercontent.com/vveg26/sing-box-onekey/main/install.sh
+        wget --no-check-certificate -O ${SCRIPT_FILE_PATH} https://raw.githubusercontent.com/cn6u9/cn6u9/main/sing-box-onekey/install.sh
         chmod +x ${SCRIPT_FILE_PATH}
     fi
 }
@@ -2043,7 +2041,7 @@ disable_auto_clear_log() {
 #enable bbr
 enable_bbr() {
     # temporary workaround for installing bbr
-    bash <(curl -L -s https://raw.githubusercontent.com/teddysun/across/master/bbr.sh)
+    bash <(curl -L -s https://raw.githubusercontent.com/chiakge/Linux-NetSpeed/master/tcp.sh)
     echo ""
 }
 
@@ -2051,7 +2049,7 @@ enable_bbr() {
 
 #for cert issue
 ssl_cert_issue() {
-    bash <(curl -Ls https://raw.githubusercontent.com/FranzKafkaYu/BashScripts/main/SSLAutoInstall/SSLAutoInstall.sh)
+    bash <(curl -Ls https://raw.githubusercontent.com/cn6u9/cn6u9/main/sing-box-onekey/SSLAutoInstall.sh)
 }
 
 # enable warp
