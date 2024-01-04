@@ -1,17 +1,5 @@
 # Xray-core/sing-box 一键脚本快速安装
 
-- [感谢 JetBrains 提供的非商业开源软件开发授权](https://www.jetbrains.com/?from=v2ray-agent)
-- [Thanks for non-commercial open source development authorization by JetBrains](https://www.jetbrains.com/?from=v2ray-agent)
-
-- [English Version](https://github.com/mack-a/v2ray-agent/blob/master/documents/en/README_EN.md)
-- [VPS选购攻略，避坑指南](https://www.v2ray-agent.com/archives/1679975663984)
-- [TG频道](https://t.me/v2rayAgentChannel)、[TG群组](https://t.me/technologyshare)、[官方网站](https://www.v2ray-agent.com/)
-- [RackNerd特价优质VPS深度评测](https://www.v2ray-agent.com/archives/1688973668640)
-- [传家宝级别搬瓦工（GIA、软银），强烈推荐](https://bandwagonhost.com/aff.php?aff=64917&pid=94)
-
-- **请给个⭐支持一下**
-
-# 一、项目介绍
 
 ## 核心
 
@@ -42,30 +30,7 @@
 - 支持自主更换伪装站点[仅支持Xray-core]
 - 支持BT下载管理以及域名黑名单管理
 
-# 二、使用指南
 
-- [脚本快速搭建教程](https://www.v2ray-agent.com/archives/1682491479771)
-- [垃圾VPS大救星，hysteria2最新协议一键搭建](https://www.v2ray-agent.com/archives/1697162969693)
-- [Tuic V5性能提升及使用方法](https://www.v2ray-agent.com/archives/1687167522196)
-- [Cloudflare优选IP、自动选择最快节点教程](https://www.v2ray-agent.com/archives/1684858575649)
-- [脚本异常处理](https://www.v2ray-agent.com/archives/1684115970026)
-
-# 三、线路推荐
-
-- [VPS选购指南,避坑指南](https://www.v2ray-agent.com/archives/1679975663984)
-
-## 1.高端
-
-- [CN2 GIA](https://www.v2ray-agent.com/tags/cn2-gia)
-- [AS9929](https://www.v2ray-agent.com/tags/as9929)
-- [日本软银](https://www.v2ray-agent.com/tags/ruan-yin)
-
-## 2.性价比
-
-- [AS4837](https://www.v2ray-agent.com/tags/as4837)
-- [CMI](https://www.v2ray-agent.com/tags/cmi)
-
-# 四、安装使用
 
 ## 1.下载脚本
 
@@ -74,31 +39,13 @@
 - Github
 
 ```
-wget -P /root -N --no-check-certificate "https://raw.githubusercontent.com/mack-a/v2ray-agent/master/install.sh" && chmod 700 /root/install.sh && /root/install.sh
+wget -P /root -N --no-check-certificate "https://raw.githubusercontent.com/cn6u9/cn6u9/main/sing-box/install.sh" && chmod 700 /root/install.sh && /root/install.sh
 ```
 
 - 官方网站【备用】
 
 ```
-wget -P /root -N --no-check-certificate "https://www.v2ray-agent.com/v2ray-agent/install.sh" && chmod 700 /root/install.sh && /root/install.sh
+wget -P /root -N --no-check-certificate "https://raw.githubusercontent.com/cn6u9/cn6u9/main/sing-box/install.sh" && chmod 700 /root/install.sh && /root/install.sh
 ```
 
-## 2.使用
 
-- [2.脚本快速搭建教程](https://www.v2ray-agent.com/archives/1682491479771)
-
-# 四、反馈和建议
-
-- 提交[issue](https://github.com/mack-a/v2ray-agent/issues)、[加入](https://t.me/technologyshare)群聊
-
-# 五、捐赠
-
-- 感谢您对开源项目的关注和支持。如果您觉得这个项目对您有帮助，欢迎通过以下方式进行捐赠。
-
-- [购买VPS捐赠](https://www.v2ray-agent.com/categories/vps)
-
-- [通过虚拟币向我捐赠](https://www.v2ray-agent.com/1679123834836)
-
-# 六、许可证
-
-[AGPL-3.0](https://github.com/mack-a/v2ray-agent/blob/master/LICENSE)
