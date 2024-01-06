@@ -107,17 +107,6 @@ sudo systemctl status $service_name
 ```
 
 
-
-# 
-```
-yum -y install epel-release
-yum install centos-release-scl -y
-yum update && yum upgrade
-```
-
-
-
-
 ### Usage tuic 需要glibc 2.21以上下面自动下载编译glibc
 ```
 #aHR0cHM6Ly93cmxvZy5jbi8yMDIyLzEwLzEyODEv
