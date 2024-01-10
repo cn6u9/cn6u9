@@ -37,7 +37,7 @@ systemctl disable firewall
 ```
 0 2 * * * /sbin/reboot
 ```
-##设置22端口
+## 设置22端口
 ```
 #!/bin/bash
 
