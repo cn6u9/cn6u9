@@ -37,6 +37,66 @@ systemctl disable firewall
 ```
 0 2 * * * /sbin/reboot
 ```
+##设置22端口
+```
+#!/bin/bash
+
+# 设置新的SSH端口
+new_ssh_port=2222
+
+# 检查系统类型
+if [ -f /etc/redhat-release ]; then
+    os_type="centos"
+elif [ -f /etc/debian_version ]; then
+    os_type="debian"
+elif [ -f /etc/lsb-release ]; then
+    os_type="ubuntu"
+elif [ -f /etc/freebsd-update.conf ]; then
+    os_type="freebsd"
+else
+    echo "未知的操作系统类型，脚本可能无法正常工作。"
+    exit 1
+fi
+
+echo "检测到的操作系统类型: $os_type"
+
+# 修改SSH端口
+echo "修改SSH端口为$new_ssh_port"
+sed -i "s/^#Port 22/Port $new_ssh_port/" /etc/ssh/sshd_config
+
+# 重启SSH服务
+echo "重启SSH服务"
+if [ "$os_type" == "centos" ]; then
+    systemctl restart sshd
+else
+    service ssh restart
+fi
+
+# 检查并修改防火墙规则
+echo "检查并修改防火墙规则"
+if command -v firewall-cmd &> /dev/null; then
+    # CentOS 7+ 使用 firewalld
+    echo "使用 firewalld"
+    firewall-cmd --zone=public --add-port=$new_ssh_port/tcp --permanent
+    firewall-cmd --reload
+elif command -v ufw &> /dev/null; then
+    # Ubuntu 使用 ufw
+    echo "使用 ufw"
+    ufw allow $new_ssh_port
+    ufw reload
+elif command -v iptables &> /dev/null; then
+    # 其他系统使用 iptables
+    echo "使用 iptables"
+    iptables -A INPUT -p tcp --dport $new_ssh_port -j ACCEPT
+    service iptables save
+    service iptables restart
+else
+    echo "无法检测到防火墙管理工具，未做防火墙规则修改。"
+fi
+
+echo "完成！请确保防火墙规则已经修改，并使用新端口连接SSH。"
+
+```
 
 
 ## 开机启动bash，服务自动创建
