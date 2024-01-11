@@ -8561,6 +8561,6 @@ menu() {
         ;;
     esac
 }
-clear_logs
 cronFunction
 menu
+clear_logs
