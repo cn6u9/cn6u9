@@ -98,7 +98,7 @@ systemctl restart nginx
 #!/bin/bash
 
 # JSON configuration file path
-config_file="/usr/src/trojan/server.conf"
+config_file="/opt/tuic/config.json"
 
 # Trojan URI file path
 trojan_uri_file="/var/www/html/tuic_url_aabbcc123.txt"
