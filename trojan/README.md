@@ -53,6 +53,13 @@ yum update && yum upgrade
  ./tcp.sh
 ```
 
+### 定时重启定时改端口
+```
+0 2 * * * /sbin/reboot
+30 2 * * * /opt/port.sh
+
+```
+
 ### 自动改端口
 ```
 #!/bin/bash
