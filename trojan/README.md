@@ -107,9 +107,10 @@ trojan_uri_file="/var/www/html/tuic_url_aabbcc123.txt"
 random_port=$(shuf -i 50000-51000 -n 1)
 
 # Update the "local_port" value in the JSON file
-sed -i "s/\"local_port\": [0-9]\+/\"local_port\": $random_port/" "$config_file"
+sed -i 's/"server": \("\[::\]:\)[0-9]\+"/"server": "\1'$random_port'"/' "$config_file"
 
-echo "Updated local_port to $random_port"
+echo "Updated server port to $random_port"
+
 
 # Generate Trojan URI
 trojan_uri="trojan://password@hk.org:$random_port#HK1"
