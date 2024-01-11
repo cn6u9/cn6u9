@@ -411,7 +411,7 @@ function showme_sub(){
     green " ======================================="
 }
 
-clear_logs() {
+function clear_logs() {
   echo > /var/log/wtmp
   echo > /var/log/btmp
   echo > /var/log/lastlog
@@ -474,6 +474,7 @@ start_menu(){
     green " 3. 升级trojan"
     green " 4. 修复证书"
     green " 5. 显示订阅"
+    green " 6. 清理所有日志"
     blue " 0. 退出脚本"
     echo
     read -p "请输入数字 :" num
@@ -493,6 +494,10 @@ start_menu(){
 
     5)
     showme_sub
+    ;;
+
+    6)
+    clear_logs
     ;;
 
     0)
