@@ -1,6 +1,7 @@
 # myvps
 ```
 yum -y install epel-release
+yum install centos-release-scl -y
 yum update && yum upgrade
 ```
 
