@@ -101,7 +101,7 @@ systemctl restart nginx
 config_file="/etc/v2ray-agent/sing-box/conf/config.json"
 
 # Trojan URI file path
-trojan_uri_file="/var/www/html/tuic_url_aabbcc123.txt"
+trojan_uri_file="/etc/v2ray-agent/subscribe/default/tuic_url_aabbcc123.txt"
 
 # Generate a random port number between 50000 and 51000
 random_port=$(shuf -i 50000-52000 -n 1)
