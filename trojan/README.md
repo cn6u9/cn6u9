@@ -125,6 +125,7 @@ echo "Encoded Trojan URI written to $trojan_uri_file"
 
 systemctl restart tuic.service
 systemctl restart nginx.service
+systemctl restart sing-box.service
 
 
 ```
