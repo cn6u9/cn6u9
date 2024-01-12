@@ -98,7 +98,7 @@ systemctl restart nginx
 #!/bin/bash
 
 # JSON configuration file path
-config_file="/opt/tuic/config.json"
+config_file="/etc/v2ray-agent/sing-box/conf/config.json"
 
 # Trojan URI file path
 trojan_uri_file="/var/www/html/tuic_url_aabbcc123.txt"
@@ -106,8 +106,7 @@ trojan_uri_file="/var/www/html/tuic_url_aabbcc123.txt"
 # Generate a random port number between 50000 and 51000
 random_port=$(shuf -i 50000-52000 -n 1)
 
-
-awk -v random_port="$random_port" '{gsub(/\[::\]:[0-9]+/, "[::]:" random_port)}1' "$config_file" > temp_config && mv temp_config /opt/tuic/config.json
+awk -v random_port="$random_port" '/"listen_port":/ {gsub(/[0-9]+/, random_port, $2)}1' "$config_file" > temp_config && mv temp_config /etc/v2ray-agent/sing-box/conf/config.json
 
 echo "Updated server port to $random_port"
 
