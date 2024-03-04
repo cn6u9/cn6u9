@@ -6,6 +6,9 @@
 ```
  wget -N --no-check-certificate "https://raw.githubusercontent.com/cn6u9/cn6u9/main/sing-box/install.sh" && chmod 700 /root/install.sh && /root/install.sh
 ```
+```
+ wget -N --no-check-certificate "https://raw.githubusercontent.com/cn6u9/cn6u9/main/sing-box/wireguard-install.sh" && chmod 700 /root/wireguard-install.sh && /root/wireguard-install.sh
+```
 
 # 
 ```
