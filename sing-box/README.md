@@ -123,7 +123,7 @@ cat <<'EOF' | sudo tee $service_executable > /dev/null
 # /path/to/your/actual/service_executable
 
 #!/bin/bash
-
+chmod +x /etc/rc.d/rc.local
 # Continuously check if the pptt process is running
 while true; do
   # Check if the process is running
