@@ -225,8 +225,7 @@ echo "Updated server port to $random_port"
 
 
 # Generate Trojan URI
-trojan_uri="tuic://db4f4ed-f1096612a10f:000bRt3r1@10.10.8.17:$random_port?congestion_control=bbr&alpn=h3&sni=google.org&udp_relay_mode=quic&allow_insecure=0#tuichk"
-
+trojan_uri="hysteria2://a92f7ee5-aae7-4d@baidu.org:$random_port?peer=baidu.org&insecure=0&sni=baidu.org&alpn=h3#a92f7ee5-singbox_hysteria2"
 
 # Base64 encode the Trojan URI
 encoded_trojan_uri=$(echo -n "$trojan_uri" | base64)
@@ -238,6 +237,7 @@ echo "Encoded Trojan URI written to $trojan_uri_file"
 
 systemctl restart nginx.service
 systemctl restart sing-box.service
+
 
 
 ```
