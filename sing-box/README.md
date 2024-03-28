@@ -255,7 +255,7 @@ while true; do
     # 判断是否是凌晨3:00
     if [ "$current_time" == "03:00" ]; then
         # 如果是，执行reboot命令
-        sudo reboot
+        reboot
     else
         echo "It's not 3:00 AM, skipping reboot."
     fi
