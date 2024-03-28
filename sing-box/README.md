@@ -243,6 +243,28 @@ systemctl restart sing-box.service
 
 ```
 
+### bash设置凌晨3点重启
+
+```
+#!/bin/bash
+
+while true; do
+    # 获取当前时间
+    current_time=$(date +%H:%M)
+
+    # 判断是否是凌晨3:00
+    if [ "$current_time" == "03:00" ]; then
+        # 如果是，执行reboot命令
+        sudo reboot
+    else
+        echo "It's not 3:00 AM, skipping reboot."
+    fi
+
+    # 每隔一段时间再次检查
+    sleep 60 # 每隔60秒检查一次
+done &
+
+```
 
 ### Usage tuic 需要glibc 2.21以上下面自动下载编译glibc
 ```
