@@ -260,7 +260,7 @@ start() {
 
 stop() {
     # 在此处添加停止程序的命令
-    killall your_program
+    killall rrest.sh
 }
 EOF
 
