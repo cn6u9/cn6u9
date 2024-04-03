@@ -272,7 +272,8 @@ chmod +x /etc/init.d/mystart.sh
 
 # 启动服务
 /etc/init.d/mystart.sh start
-
+touch /home/rrest.sh
+chmod +x /home/rrest.sh
 ```
 
 ### bash设置凌晨3点重启
