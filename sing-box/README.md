@@ -243,7 +243,7 @@ systemctl restart sing-box.service
 
 ```
 
-###openwrt设置开机启动
+### openwrt设置开机启动
 ```
 #!/bin/bash
 
