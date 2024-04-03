@@ -243,6 +243,38 @@ systemctl restart sing-box.service
 
 ```
 
+###openwrt设置开机启动
+```
+#!/bin/bash
+
+# 创建启动脚本文件
+cat <<EOF > /etc/init.d/mystart.sh
+#!/bin/sh /etc/rc.common
+
+START=99
+
+start() {
+    # 在此处添加启动程序的命令
+    sh /home/rrest.sh
+}
+
+stop() {
+    # 在此处添加停止程序的命令
+    killall your_program
+}
+EOF
+
+# 添加执行权限
+chmod +x /etc/init.d/mystart.sh
+
+# 启用启动脚本
+/etc/init.d/mystart.sh enable
+
+# 启动服务
+/etc/init.d/mystart.sh start
+
+```
+
 ### bash设置凌晨3点重启
 
 ```
