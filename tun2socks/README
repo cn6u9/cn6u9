@@ -1,0 +1,21 @@
+
+
+start.bat
+tun2socks-windows-4.0-amd64.exe -tunName tap -tunAddr 10.0.0.2 -tunGw 10.0.0.1 -proxyType socks -proxyServer 127.0.0.1:1080 -dnsServer 8.8.8.8,8.8.4.4
+
+//安装完成tap-windows-9.22之后需要打开网卡改变名字为tap，需要首先运行上面命令，否则下面route找不到10.0.0.1,而且下面的命令需要高权限运行，上面的tun2socks不需要高权限运行
+
+route delete 0.0.0.0 mask 0.0.0.0
+
+route add 0.0.0.0 mask 0.0.0.0 10.0.0.1 metric 6
+
+route add 4.151.135.217 192.168.7.1 metric 5
+
+// 4.151.135.217 是你的1080代理的vps地址，192.168.7.1是你的默认网卡网关。
+
+
+stop.bat
+恢复网关
+route delete 0.0.0.0 mask 0.0.0.0
+
+route add 0.0.0.0 mask 0.0.0.0 192.168.7.1 metric 50
