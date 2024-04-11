@@ -1,5 +1,6 @@
 
-
+### 方案一
+```
 start.bat
 tun2socks-windows-4.0-amd64.exe -tunName tap -tunAddr 10.0.0.2 -tunGw 10.0.0.1 -proxyType socks -proxyServer 127.0.0.1:1080 -dnsServer 8.8.8.8,8.8.4.4
 
@@ -21,10 +22,16 @@ route delete 0.0.0.0 mask 0.0.0.0
 route add 0.0.0.0 mask 0.0.0.0 192.168.7.1 metric 50
 
 
-### build
-```
+build
+
 git clone https://github.com/eycorsican/go-tun2socks.git
 cd /go-tun2socks/cmd/tun2socks/
 CGO_ENABLED=1 GOOS=windows GOARCH=amd64 CC=x86_64-w64-mingw32-gcc go build -ldflags="-s -w"
+
+
+```
+### 方案二
+```
+
 
 ```
