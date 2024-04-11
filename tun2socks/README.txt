@@ -38,7 +38,7 @@ cd tun2socks
 make
 
 
-tun2socks -device wintun -proxy socks5://127.0.0.1:1080 -interface "WIFI"
+tun2socks -device wintun -proxy socks5://127.0.0.1:1080 -interface "wifi"
 netsh interface ipv4 set address name="wintun" source=static addr=192.168.123.1 mask=255.255.255.0
 netsh interface ipv4 set dnsservers name="wintun" static address=8.8.8.8 register=none validate=no
 netsh interface ipv4 add route 0.0.0.0/0 "wintun" 192.168.123.1 metric=1
