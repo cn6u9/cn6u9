@@ -33,5 +33,14 @@ CGO_ENABLED=1 GOOS=windows GOARCH=amd64 CC=x86_64-w64-mingw32-gcc go build -ldfl
 ### 方案二
 ```
 
+https://github.com/xjasonlyu/tun2socks.git
+cd tun2socks
+make
+
+
+tun2socks -device wintun -proxy socks5://host:port -interface "WIFI"
+netsh interface ipv4 set address name="wintun" source=static addr=192.168.123.1 mask=255.255.255.0
+netsh interface ipv4 set dnsservers name="wintun" static address=8.8.8.8 register=none validate=no
+netsh interface ipv4 add route 0.0.0.0/0 "wintun" 192.168.123.1 metric=1
 
 ```
