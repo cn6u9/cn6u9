@@ -38,6 +38,9 @@ cd tun2socks
 make
 
 需要把默认上网的网卡改名成wifi
+改变网卡名字，Ethernet0是系统默认，wifi是下面命令需要的
+
+netsh interface set interface name="Ethernet0" newname="wifi"
 tun2socks-windows-amd64.exe -device wintun -proxy socks5://127.0.0.1:1080 -interface "wifi"
 netsh interface ipv4 set address name="wintun" source=static addr=192.168.123.1 mask=255.255.255.0
 netsh interface ipv4 set dnsservers name="wintun" static address=8.8.8.8 register=none validate=no
