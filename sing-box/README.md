@@ -14,7 +14,17 @@
 ```
 git clone https://github.com/Night-stars-1/clash-meta.git
 or
-寻找中
+go env -w GOPROXY=https://goproxy.io,direct
+
+git clone https://github.com/JMVoid/mihomo.git
+cd mihomo && go mod download
+go build
+
+Build with gvisor tun stack:
+
+go build -tags with_gvisor
+
+
 
 ```
 
