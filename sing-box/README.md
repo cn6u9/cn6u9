@@ -20,11 +20,16 @@ git clone https://github.com/JMVoid/mihomo.git
 cd mihomo && go mod download
 go build
 
-Build with gvisor tun stack:
-
+编译tun模式:
 go build -tags with_gvisor
 
-
+or
+git clone https://github.com/LibNyanpasu/clash-nyanpasu.git
+pnpm i
+pnpm check
+pnpm dev
+pnpm dev:diff
+pnpm build
 
 ```
 
