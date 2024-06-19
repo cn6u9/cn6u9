@@ -23,14 +23,6 @@ go build
 编译tun模式:
 go build -tags with_gvisor
 
-or
-git clone https://github.com/LibNyanpasu/clash-nyanpasu.git
-pnpm i
-pnpm check
-pnpm dev
-pnpm dev:diff
-pnpm build
-
 ```
 
 # 
