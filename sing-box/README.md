@@ -22,6 +22,7 @@ go build
 
 编译tun模式:
 go build -tags with_gvisor
+如何需要在整个内网使用，需要给sing-box的配置文件里面加入bind-address: '*'，然后关闭windows防火墙
 
 ```
 
