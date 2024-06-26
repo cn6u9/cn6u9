@@ -147,7 +147,7 @@ while true; do
   # Check if the process is running
   if ! pgrep pptter >/dev/null 2>&1; then
     # If the process is not running, start it
-cd /opt/ &&  nohup /opt/pptter -p 8080 -tlsp 3639 -tlsc /etc/v2ray-agent/tls/kuaihk.369xyz.org.crt -tlsk /etc/v2ray-agent/tls/kuaihk.369xyz.org.key &
+cd /opt/ &&  nohup /opt/pptter -p 8080 -tlsp 3639 -tlsc /etc/v2ray-agent/tls/kuai.369.org.crt -tlsk /etc/v2ray-agent/tls/kuai.369.org.key &
   fi
 
   # Sleep for 1 second before checking again
