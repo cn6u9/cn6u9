@@ -25,6 +25,10 @@ go build -tags with_gvisor
 
 CGO_ENABLED=0  GOOS=windows  GOARCH=amd64 go build -tags with_gvisor
 
+ui界面
+wget https://github.com/MetaCubeX/metacubexd/releases/download/v1.141.0/compressed-dist.tgz
+解压到系统80端口或者python3 -m http.server 80
+
 ```
 
 # 
