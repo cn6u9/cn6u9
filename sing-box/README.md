@@ -206,7 +206,48 @@ sudo systemctl status $service_name
 ```
 ### 12小时重启一次
 ```
-0 */12 * * * systemctl restart my_service.service
+0 0 * * * systemctl restart my_service.service
+
+```
+### 设置中国时区
+```
+#!/bin/bash
+
+# 安装NTP
+if command -v apt-get &> /dev/null; then
+    sudo apt-get update
+    sudo apt-get install -y ntp
+elif command -v yum &> /dev/null; then
+    sudo yum install -y ntp
+else
+    echo "无法识别的包管理器。请手动安装NTP。"
+    exit 1
+fi
+
+# 设置时区为中国标准时间
+sudo timedatectl set-timezone Asia/Shanghai
+
+# 配置NTP服务器
+NTP_CONF_FILE="/etc/ntp.conf"
+NTP_SERVERS="server 0.cn.pool.ntp.org iburst
+server 1.cn.pool.ntp.org iburst
+server 2.cn.pool.ntp.org iburst
+server 3.cn.pool.ntp.org iburst"
+
+sudo bash -c "echo '$NTP_SERVERS' > $NTP_CONF_FILE"
+
+# 重启NTP服务
+if command -v systemctl &> /dev/null; then
+    sudo systemctl restart ntp || sudo systemctl restart ntpd
+else
+    echo "无法识别的系统管理工具。请手动重启NTP服务。"
+    exit 1
+fi
+
+# 检查时间同步状态
+timedatectl status
+ntpq -p
+
 ```
 
 ### tuic自动改端口
