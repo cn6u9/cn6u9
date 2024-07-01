@@ -29,8 +29,10 @@ ui界面
 wget https://github.com/MetaCubeX/metacubexd/releases/download/v1.141.0/compressed-dist.tgz
 解压到系统80端口或者python3 -m http.server 80
 
-机场使用的配置文件
-https://github.com/cn6u9/cn6u9/blob/main/sing-box/mihomo.json
+机场使用
+git clone https://github.com/hsernos/Txray.git
+GOOS=windows GOARCH=amd64 CGO_ENABLED=0 go build Txray.go
+
 
 ```
 
