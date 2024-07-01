@@ -37,7 +37,8 @@ node -d
 sub update-node
 
 setting
-setting socks 3333
+setting socks 1080
+run all 
 
 
 
