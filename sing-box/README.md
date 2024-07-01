@@ -204,6 +204,10 @@ sudo systemctl enable $service_name
 sudo systemctl status $service_name
 
 ```
+### 12小时重启一次
+```
+0 */12 * * * systemctl restart my_service.service
+```
 
 ### tuic自动改端口
 ```
