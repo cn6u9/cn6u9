@@ -12,6 +12,7 @@
 
 ### 客户端
 ```
+git clone https://github.com/GUI-for-Cores/GUI.for.SingBox.git
 git clone https://github.com/Night-stars-1/clash-meta.git
 or
 go env -w GOPROXY=https://goproxy.io,direct
