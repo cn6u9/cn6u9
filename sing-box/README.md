@@ -34,12 +34,21 @@ wget https://github.com/MetaCubeX/metacubexd/releases/download/v1.141.0/compress
 git clone https://github.com/hsernos/Txray.git
 GOOS=windows GOARCH=amd64 CGO_ENABLED=0 go build Txray.go
 sub add http:111.111.111.11/ -r test
-node -d
 sub update-node
+
+node -d
+node tcping
 
 setting
 setting socks 1080
-run all 
+# 设置启动时从订阅更新节点
+setting run_before "sub update-node"
+# 设置启动时对节点进行tcp测试，然后运行延迟最小的那个
+setting run_before "node tcping | run"
+
+run 1-6
+
+
 
 
 
