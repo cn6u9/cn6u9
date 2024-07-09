@@ -4,12 +4,7 @@
 #
 # Based on the work of Nyr and contributors at:
 # https://github.com/Nyr/wireguard-install
-#
-# Copyright (c) 2022-2024 Lin Song <linsongui@gmail.com>
-# Copyright (c) 2020-2023 Nyr
-#
-# Released under the MIT License, see the accompanying file LICENSE.txt
-# or https://opensource.org/licenses/MIT
+
 
 exiterr()  { echo "Error: $1" >&2; exit 1; }
 exiterr2() { exiterr "'apt-get install' failed."; }
