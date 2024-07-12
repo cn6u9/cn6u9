@@ -237,7 +237,7 @@ show_config() {
 		echo
 		printf '%s' "Server IP: "
 		[ -n "$public_ip" ] && printf '%s\n' "$public_ip" || printf '%s\n' "$ip"
-		echo "Port: UDP/51820"
+		echo "Port: UDP/31820"
 		echo "Client name: client"
 		echo "Client DNS: Google Public DNS"
 	fi
@@ -254,14 +254,14 @@ select_port() {
 	if [ "$auto" = 0 ]; then
 		echo
 		echo "Which port should WireGuard listen to?"
-		read -rp "Port [51820]: " port
+		read -rp "Port [31820]: " port
 		until [[ -z "$port" || "$port" =~ ^[0-9]+$ && "$port" -le 65535 ]]; do
 			echo "$port: invalid port."
-			read -rp "Port [51820]: " port
+			read -rp "Port [31820]: " port
 		done
-		[[ -z "$port" ]] && port=51820
+		[[ -z "$port" ]] && port=31820
 	else
-		port=51820
+		port=31820
 	fi
 }
 
