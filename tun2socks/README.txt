@@ -38,7 +38,7 @@ cd tun2socks
 make
 
 需要把默认上网的网卡改名成wifi
-改变网卡名字，Ethernet0是系统默认，wifi是下面命令需要的
+改变网卡名字，Ethernet0是系统默认，wifi是下面命令需要的，windows10下可用
 
 netsh interface set interface name="Ethernet0" newname="wifi"
 start tun2socks-windows-amd64.exe -device wintun -proxy socks5://127.0.0.1:1080 -interface "wifi"
@@ -46,6 +46,15 @@ netsh interface ipv4 set address name="wintun" source=static addr=192.168.123.1 
 netsh interface ipv4 set dnsservers name="wintun" static address=8.8.8.8 register=none validate=no
 netsh interface ipv4 add route 0.0.0.0/0 "wintun" 192.168.123.1 metric=1
 route add 4.151.135.217 192.168.7.1 metric 5
+
+windows 2008 下目前不可用，需要改写
+netsh interface set interface name="Ethernet0" newname="wifi"
+start tun2socks-windows-amd64.exe -device wintun -proxy socks5://127.0.0.1:1080 -interface "wifi"
+netsh interface ipv4 set address name="wintun" source=static addr=192.168.123.1 mask=255.255.255.0
+netsh interface ipv4 set dnsservers name="wintun" static address=8.8.8.8 register=none validate=no
+netsh interface ipv4 add route prefix=0.0.0.0/0 interface="wintun" nexthop=192.168.123.1 metric=1
+route add 4.151.135.217 mask 255.255.255.255 192.168.7.1 metric 5
+
 
 
 ```
