@@ -1,8 +1,5 @@
 #!/bin/bash
-#
 # https://github.com/hwdsl2/wireguard-install
-#
-# Based on the work of Nyr and contributors at:
 # https://github.com/Nyr/wireguard-install
 
 
