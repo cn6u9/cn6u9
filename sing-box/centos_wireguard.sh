@@ -1,5 +1,5 @@
 #!/bin/bash
-
+#https://github.com/lrQ1n/WireGuard
 #判断系统
 if [ ! -e '/etc/redhat-release' ]; then
 echo "仅支持centos7"
