@@ -30,7 +30,7 @@ wireguard_changeport(){
 
 	cd /etc/wireguard
 
-	port=$(rand 10000 60000)
+	port=$(rand 20000 60000)
 
 	echo "**********************************"
 	echo          new port is: $port
