@@ -39,6 +39,7 @@ wireguard_changeport(){
     sudo sed -ri "s|^.*ListenPort = .*$|ListenPort = $port|" wg0.conf
 	sudo sed -ri "s|(^.*Endpoint.*\>:).*|\1$port|" client.conf
 	sudo sed -ri "s|(^.*Endpoint.*\>:).*|\1$port|" client0.conf
+ 	echo $port > /var/www/html/port.txt
 }
 sudo wg-quick down wg0
 wireguard_changeport
