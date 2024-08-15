@@ -13,6 +13,41 @@ check_ip() {
 	printf '%s' "$1" | tr -d '\n' | grep -Eq "$IP_REGEX"
 }
 
+change_port() {
+cp /root/a.conf /etc/wireguard/client.conf
+cp /root/b.conf /etc/wireguard/client.conf
+cp /root/c.conf /etc/wireguard/client.conf
+cp /root/0.conf /etc/wireguard/client.conf
+cp /root/1.conf /etc/wireguard/client.conf
+rand(){
+    min=$1
+    max=$(($2-$min+1))
+    num=$(cat /dev/urandom | head -n 10 | cksum | awk -F ' ' '{print $1}')
+    echo $(($num%$max+$min))  
+}
+wireguard_changeport(){
+	clear
+
+	cd /etc/wireguard
+
+	port=$(rand 10000 60000)
+
+	echo "**********************************"
+	echo          new port is: $port
+	echo "**********************************"
+
+    sudo sed -ri "s|^.*ListenPort = .*$|ListenPort = $port|" wg0.conf
+	sudo sed -ri "s|(^.*Endpoint.*\>:).*|\1$port|" client.conf
+	sudo sed -ri "s|(^.*Endpoint.*\>:).*|\1$port|" client0.conf
+}
+sudo wg-quick down wg0
+wireguard_changeport
+sudo wg-quick up wg0
+sudo wg
+sudo qrencode -t ansiutf8 < /etc/wireguard/client.conf
+sudo qrencode -t ansiutf8 < /etc/wireguard/client0.conf
+}
+
 check_os() {
 	if grep -qs "ubuntu" /etc/os-release; then
 		os="ubuntu"
@@ -794,9 +829,10 @@ else
 	echo "   3) Remove an existing client"
 	echo "   4) Show QR code for a client"
 	echo "   5) Remove WireGuard"
-	echo "   6) Exit"
+	echo "   6) change port"
+	echo "   7) Exit"
 	read -rp "Option: " option
-	until [[ "$option" =~ ^[1-6]$ ]]; do
+	until [[ "$option" =~ ^[1-7]$ ]]; do
 		echo "$option: invalid selection."
 		read -rp "Option: " option
 	done
@@ -1014,6 +1050,9 @@ else
 			exit
 		;;
 		6)
+			change_port
+		;;
+		7)
 			exit
 		;;
 	esac
