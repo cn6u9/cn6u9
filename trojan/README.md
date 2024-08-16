@@ -55,9 +55,12 @@ yum update && yum upgrade
 
 ### 定时重启定时改端口
 ```
+下面是夜里2点半执行port.sh
 0 2 * * * /sbin/reboot
 30 2 * * * /opt/port.sh
 
+每个小时执行一次trojan.sh
+0 * * * * /etc/singbox/trojan.sh
 ```
 
 ### 自动改端口
