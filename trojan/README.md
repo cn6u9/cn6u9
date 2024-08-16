@@ -85,7 +85,8 @@ trojan_uri="trojan://password@hk.org:$random_port#HK1"
 encoded_trojan_uri=$(echo -n "$trojan_uri" | base64)
 
 # Write encoded Trojan URI to file
-echo "$encoded_trojan_uri" > "$trojan_uri_file"
+＃echo "$encoded_trojan_uri" > "$trojan_uri_file"
+echo "$random_port" > "$trojan_uri_file"
 
 echo "Encoded Trojan URI written to $trojan_uri_file"
 
