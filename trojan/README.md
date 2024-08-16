@@ -94,4 +94,25 @@ systemctl restart trojan
 systemctl restart nginx
 
 ```
+### 本地读取并改端口
+```
+#!/bin/bash
 
+# 使用curl从baidu.com获取端口号
+PORT=$(curl -s http://18.org/url_aabbcc123.txt)
+
+# 从trojan.txt文件中读取当前端口号
+CURRENT_PORT=$(grep -Po '"remote_port": \K[0-9]+' /etc/singbox/180trojan.json)
+
+# 判断是否需要替换端口号
+if [ "$PORT" -ne "$CURRENT_PORT" ]; then
+  # 替换port
+  sed -i "s/\"remote_port\": $CURRENT_PORT,/\"remote_port\": $PORT,/" /etc/singbox/180trojan.json
+  echo "端口已从 $CURRENT_PORT 替换为 $PORT"
+  sleep 1
+  systemctl restart my_service.service
+else
+  echo "端口号相同，无需替换"
+fi
+
+```
