@@ -70,8 +70,8 @@ config_file="/usr/src/trojan/server.conf"
 # Trojan URI file path
 trojan_uri_file="/usr/share/nginx/html/trojan_url_aabbcc123.txt"
 
-# Generate a random port number between 50000 and 51000
-random_port=$(shuf -i 50000-51000 -n 1)
+# Generate a random port number between 30000 and 61000
+random_port=$(shuf -i 30000-61000 -n 1)
 
 # Update the "local_port" value in the JSON file
 sed -i "s/\"local_port\": [0-9]\+/\"local_port\": $random_port/" "$config_file"
