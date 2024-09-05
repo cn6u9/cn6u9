@@ -14,39 +14,44 @@ check_ip() {
 }
 
 change_port() {
-cp /root/a.conf /etc/wireguard/client.conf
-cp /root/b.conf /etc/wireguard/client.conf
-cp /root/c.conf /etc/wireguard/client.conf
-cp /root/0.conf /etc/wireguard/client.conf
-cp /root/1.conf /etc/wireguard/client.conf
-rand(){
-    min=$1
-    max=$(($2-$min+1))
-    num=$(cat /dev/urandom | head -n 10 | cksum | awk -F ' ' '{print $1}')
-    echo $(($num%$max+$min))  
-}
-wireguard_changeport(){
-	clear
+    cp /root/a.conf /etc/wireguard/client.conf
+    cp /root/b.conf /etc/wireguard/client.conf
+    cp /root/c.conf /etc/wireguard/client.conf
+    cp /root/0.conf /etc/wireguard/client.conf
+    cp /root/1.conf /etc/wireguard/client.conf
 
-	cd /etc/wireguard
+    rand(){
+        min=$1
+        max=$(($2-$min+1))
+        num=$(cat /dev/urandom | head -n 10 | cksum | awk -F ' ' '{print $1}')
+        echo $(($num%$max+$min))  
+    }
 
-	port=$(rand 20000 60000)
+    wireguard_changeport(){
+        clear
 
-	echo "**********************************"
-	echo          new port is: $port
-	echo "**********************************"
+        cd /etc/wireguard
 
-    sudo sed -ri "s|^.*ListenPort = .*$|ListenPort = $port|" wg0.conf
-	sudo sed -ri "s|(^.*Endpoint.*\>:).*|\1$port|" client.conf
-	sudo sed -ri "s|(^.*Endpoint.*\>:).*|\1$port|" client0.conf
- 	echo $port > /var/www/html/port.txt
-}
-sudo wg-quick down wg0
-wireguard_changeport
-sudo wg-quick up wg0
-sudo wg
-sudo qrencode -t ansiutf8 < /etc/wireguard/client.conf
-sudo qrencode -t ansiutf8 < /etc/wireguard/client0.conf
+        port=$(rand 10000 60000)
+
+        echo "**********************************"
+        echo          new port is: $port
+        echo "**********************************"
+
+        # Write the new port to the file
+        echo $port > /var/www/html/wireguardport.txt
+
+        sudo sed -ri "s|^.*ListenPort = .*$|ListenPort = $port|" wg0.conf
+        sudo sed -ri "s|(^.*Endpoint.*\>:).*|\1$port|" client.conf
+        sudo sed -ri "s|(^.*Endpoint.*\>:).*|\1$port|" client0.conf
+    }
+
+    sudo wg-quick down wg0
+    wireguard_changeport
+    sudo wg-quick up wg0
+    sudo wg
+    sudo qrencode -t ansiutf8 < /etc/wireguard/client.conf
+    sudo qrencode -t ansiutf8 < /etc/wireguard/client0.conf
 }
 
 check_os() {
