@@ -10,7 +10,85 @@
  wget -N --no-check-certificate "https://raw.githubusercontent.com/cn6u9/cn6u9/main/sing-box/wireguard-install.sh" && chmod 700 /root/wireguard-install.sh && /root/wireguard-install.sh
 ```
 
+### wireguard 服务端自动改端口写文件
+```
+change_port() {
+    cp /root/a.conf /etc/wireguard/client.conf
+    cp /root/b.conf /etc/wireguard/client.conf
+    cp /root/c.conf /etc/wireguard/client.conf
+    cp /root/0.conf /etc/wireguard/client.conf
+    cp /root/1.conf /etc/wireguard/client.conf
 
+    rand(){
+        min=$1
+        max=$(($2-$min+1))
+        num=$(cat /dev/urandom | head -n 10 | cksum | awk -F ' ' '{print $1}')
+        echo $(($num%$max+$min))  
+    }
+
+    wireguard_changeport(){
+        clear
+
+        cd /etc/wireguard
+
+        port=$(rand 10000 60000)
+
+        echo "**********************************"
+        echo          new port is: $port
+        echo "**********************************"
+
+        # Write the new port to the file
+        echo $port > /var/www/html/wireguardport.txt
+
+        sudo sed -ri "s|^.*ListenPort = .*$|ListenPort = $port|" wg0.conf
+        sudo sed -ri "s|(^.*Endpoint.*\>:).*|\1$port|" client.conf
+        sudo sed -ri "s|(^.*Endpoint.*\>:).*|\1$port|" client0.conf
+    }
+
+    sudo wg-quick down wg0
+    wireguard_changeport
+    sudo wg-quick up wg0
+    sudo wg
+    sudo qrencode -t ansiutf8 < /etc/wireguard/client.conf
+    sudo qrencode -t ansiutf8 < /etc/wireguard/client0.conf
+}
+
+change_port
+
+
+```
+### wireguard 客户端自动改端口
+```
+
+#!/bin/bash
+#find /|grep openvpn查找本地配置文件所在位置kali下面是/etc/NetworkManager/system-connections/a.nmconnection
+# Define the local configuration file path
+config_file="/etc/NetworkManager/system-connections/a.nmconnection"
+
+# Fetch the current port from WireGuard configuration
+current_port=$(grep -oP '(?<=endpoint=.*:)\d+' "$config_file")
+
+# Fetch the remote port number using curl
+remote_port=$(curl -s http://123.2.4.0/wireguardport.txt)
+
+# Check if the current port matches the remote port
+if [ "$current_port" == "$remote_port" ]; then
+    echo "Ports match. No changes required."
+    exit 0
+else
+    echo "Ports do not match. Updating port number..."
+
+    # Replace the port number in the WireGuard configuration file
+    sudo sed -ri "s|(^.*endpoint=.*:).*|\1$remote_port|" "$config_file"
+
+    # Restart NetworkManager to apply the updated configuration
+    sudo systemctl restart NetworkManager
+
+    echo "Port number updated to $remote_port."
+fi
+
+
+```
 
 ### 客户端
 ```
