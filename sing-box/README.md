@@ -12,6 +12,7 @@
 
 ### wireguard 服务端自动改端口写文件
 ```
+#!/bin/bash
 change_port() {
     cp /root/a.conf /etc/wireguard/client.conf
     cp /root/b.conf /etc/wireguard/client.conf
