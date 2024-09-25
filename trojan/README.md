@@ -83,10 +83,11 @@ echo "Updated local_port to $random_port"
 
 # Generate Trojan URI
 trojan_uri="trojan://password@hk.org:$random_port#HK1"
+echo "trojan_uri"
 
 # Base64 encode the Trojan URI
 encoded_trojan_uri=$(echo -n "$trojan_uri" | base64)
-
+echo "encoded_trojan_uri"
 # Write encoded Trojan URI to file
 #echo "$encoded_trojan_uri" > "$trojan_uri_file"
 echo "$random_port" > "$trojan_uri_file"
