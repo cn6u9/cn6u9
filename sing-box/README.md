@@ -90,6 +90,14 @@ fi
 
 
 ```
+### ubuntu install nginx
+```
+apt-get install nginx
+systemctl status nginx
+sudo systemctl enable nginx
+
+```
+
 
 ### 客户端
 ```
