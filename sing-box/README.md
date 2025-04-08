@@ -40,6 +40,7 @@ change_port() {
 
         # Write the new port to the file
         echo $port > /var/www/html/wireguardport.txt
+        echo $port > /usr/share/nginx/html/wireguardport.txt
 
         sudo sed -ri "s|^.*ListenPort = .*$|ListenPort = $port|" wg0.conf
         sudo sed -ri "s|(^.*Endpoint.*\>:).*|\1$port|" client.conf
