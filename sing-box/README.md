@@ -180,7 +180,7 @@ systemctl disable firewall
 #!/bin/bash
 
 # 设置新的SSH端口
-new_ssh_port=2222
+new_ssh_port=22222
 
 # 检查系统类型
 if [ -f /etc/redhat-release ]; then
