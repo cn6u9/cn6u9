@@ -487,9 +487,9 @@ ${Runtime.getRuntime().exec("touch /tmp/pwned")}
     - `.php?_SESSION[name]=admin`
     - `echo $_SESSION['name']` => 'admin'
 
--`https://cybersecuritynews.com/php-extract-function-vulnerability/  `
--`https://ssd-disclosure.com/ssd-advisory-extract-double-free5-x-use-after-free7-x-8-x/  `
--`PHP 的 extract() 函数存在严重漏洞  `
+- `https://cybersecuritynews.com/php-extract-function-vulnerability/`
+- `https://ssd-disclosure.com/ssd-advisory-extract-double-free5-x-use-after-free7-x-8-x/`
+- `PHP 的 extract() 函数存在严重漏洞`
 
 
 
