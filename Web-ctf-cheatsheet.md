@@ -489,7 +489,7 @@ ${Runtime.getRuntime().exec("touch /tmp/pwned")}
 
 - `https://cybersecuritynews.com/php-extract-function-vulnerability/`
 - `https://ssd-disclosure.com/ssd-advisory-extract-double-free5-x-use-after-free7-x-8-x/`
-- `PHP 的 extract() 函数存在严重漏洞`
+- `PHP 的 extract($array, EXTR_REFS)函数存在严重漏洞,参数EXTR_REFS问题`
 
 
 
