@@ -421,8 +421,6 @@ function showme_sub(){
     green " ======================================="
     red "注意：下面仅仅是普通节点订阅链接，如使用clash等软件，请自行转换"
     green "你的Trojan订阅链接是：trojan://${password}@${domain}:${port}"
-    green " 顺便推荐一个稳定实惠的机场：https://goo.gs/SupportMe "
-    green " 顺便推荐一个性价比高的VPS：https://goo.gs/gcvps      "
     green " ======================================="
 }
 
