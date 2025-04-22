@@ -74,7 +74,7 @@ EOF
 	#设置伪装站
 	rm -rf /usr/share/nginx/html/*
 	cd /usr/share/nginx/html/
-	https://github.com/cn6u9/cn6u9/raw/main/trojan/web.zip >/dev/null 2>&1
+	wget https://github.com/cn6u9/cn6u9/raw/main/trojan/web.zip >/dev/null 2>&1
     	unzip web.zip >/dev/null 2>&1
 	systemctl stop nginx
 	sleep 5
