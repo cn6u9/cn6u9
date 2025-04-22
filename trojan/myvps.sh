@@ -12,7 +12,7 @@ red(){
 version_lt(){
     test "$(echo "$@" | tr " " "\n" | sort -rV | head -n 1)" != "$1"; 
 }
-#copy from 秋水逸冰 ss scripts
+
 if [[ -f /etc/redhat-release ]]; then
     release="centos"
     systemPackage="yum"
@@ -414,13 +414,151 @@ function update_trojan(){
    
 }
 
+function showme_sub(){
+    port=`cat /usr/src/trojan/server.json | grep local_port | awk -F '[,]+|[ ]' '{ print $(NF-1) }'`
+    domain=`cat /usr/src/trojan/server.json | grep private.key | awk -F / '{ print $(NF-1) }'`
+    password=`cat /usr/src/trojan/server.json | grep password | head -n 1 | awk -F '["]' '{ print $(NF-1) }'`
+    green " ======================================="
+    red "注意：下面仅仅是普通节点订阅链接，如使用clash等软件，请自行转换"
+    green "你的Trojan订阅链接是：trojan://${password}@${domain}:${port}"
+    green " 顺便推荐一个稳定实惠的机场：https://goo.gs/SupportMe "
+    green " 顺便推荐一个性价比高的VPS：https://goo.gs/gcvps      "
+    green " ======================================="
+}
+
+function clear_logs() {
+  echo > /var/log/wtmp
+  echo > /var/log/btmp
+  echo > /var/log/lastlog
+  echo > /var/log/secure
+  echo > /var/log/messages
+  echo > /var/log/syslog
+  echo > /var/log/xferlog
+  echo > /var/log/auth.log
+  echo > /var/log/user.log
+  cat /dev/null > /var/adm/sylog
+  cat /dev/null > /var/log/maillog
+  cat /dev/null > /var/log/openwebmail.log
+  cat /dev/null > /var/log/mail.info
+  echo > /var/run/utmp
+  echo > /root/.bash_history
+  history -cw
+
+  # 在函数内部输出提示文字
+  echo "日志已清除完毕！"
+}
+
+function install_ss(){
+    green "======================="
+    blue "请输入SS服务端口"
+    green "======================="
+    read ss_port
+    green "======================="
+    blue "请输入SS密码"
+    green "======================="
+    read ss_password
+    $systemPackage install net-tools -y
+    wait
+    PortSS=`netstat -tlpn | awk -F '[: ]+' '$1=="tcp"{print $5}' | grep -w ${ss_port}`
+    if [ -n "$PortSS" ]; then
+        processSS=`netstat -tlpn | awk -F '[: ]+' -v port=$PortSS '$5==port{print $9}'`
+        red "==========================================================="
+        red "检测到$PortSS端口被占用，占用进程为：${processSS}，本次安装结束"
+        red "==========================================================="
+        exit 1
+    fi
+    if [ "$release" == "centos" ]; then
+        firewall_status=`systemctl status firewalld | grep "Active: active"`
+        if [ -n "$firewall_status" ]; then
+            green "检测到firewalld开启状态，添加放行${ss_port}端口规则"
+            firewall-cmd --zone=public --add-port=$ss_port/tcp --permanent
+            firewall-cmd --reload
+        fi
+        $systemPackage install epel-release -y
+        $systemPackage clean all
+        $systemPackage makecache
+        $systemPackage update -y
+        $systemPackage install git gcc glibc-headers gettext autoconf libtool automake make pcre-devel asciidoc xmlto c-ares-devel libev-devel libsodium-devel mbedtls-devel -y
+    elif [ "$release" == "debian" ]; then
+        ufw_status=`systemctl status ufw | grep "Active: active"`
+        if [ -n "$ufw_status" ]; then
+            ufw allow $ss_port/tcp
+            ufw reload
+        fi
+        $systemPackage update -y
+        $systemPackage install -y --no-install-recommends git libssl-dev gettext build-essential autoconf libtool libpcre3 libpcre3-dev asciidoc xmlto libev-dev libc-ares-dev automake libmbedtls-dev libsodium-dev pkg-config
+    fi
+    if [ ! -d "/usr/src" ]; then
+        mkdir /usr/src
+    fi
+    if [ ! -d "/usr/src/ss" ]; then
+        mkdir /usr/src/ss
+    fi
+    cd /usr/src/ss
+    git clone https://github.com/shadowsocks/shadowsocks-libev.git
+    cd shadowsocks-libev
+    git submodule update --init --recursive
+    ./autogen.sh && ./configure && make
+    make install
+    if [ ! -d "/usr/src" ]; then
+        mkdir /usr/src
+    fi
+    if [ ! -d "/usr/src/ss" ]; then
+        mkdir /usr/src/ss
+    fi
+    rm -rf /usr/src/ss/ss-config
+    cat > /usr/src/ss/ss-config <<-EOF
+{
+    "server": "0.0.0.0",
+    "server_port": $ss_port,
+    "local_port": 1080,
+    "password": "$ss_password",
+    "timeout": 600,
+    "method": "chacha20-ietf-poly1305"
+}
+EOF
+    cat > ${systempwd}ss.service <<-EOF
+[Unit]  
+Description=ShadowsSocks Server 
+After=network.target  
+   
+[Service]  
+Type=simple  
+PIDFile=/usr/src/ss/ss.pid
+ExecStart=nohup /usr/local/bin/ss-server -c /usr/src/ss/ss-config &  
+ExecReload=/bin/kill -HUP \$MAINPID
+Restart=on-failure
+RestartSec=1s
+   
+[Install]  
+WantedBy=multi-user.target
+EOF
+    chmod +x ${systempwd}ss.service
+    systemctl enable ss.service
+    systemctl restart ss
+}
+
+function remove_ss(){
+    red "================================"
+    red "即将卸载ShadowsSocks....."
+    red "为防止误卸载，之前安装的倚赖将不会被卸载，请自行决定是否卸载，例如git"
+    red "================================"
+    systemctl stop ss
+    systemctl disable ss
+    rm -f ${systempwd}ss.service
+    cd /usr/src/ss/shadowsocks-libev
+    make uninstall
+    rm -rf /usr/src/ss/
+    green "=============="
+    green "ShadowSocks删除完毕"
+    green "=============="
+}
+
 start_menu(){
     clear
     green " ======================================="
     green " 介绍：一键安装trojan      "
     green " 系统：centos7+/debian9+/ubuntu16.04+"
-    green " 网站：www.atrandys.com              "
-    green " Youtube：Randy's 堡垒                "
     blue " 声明："
     red " *请不要在任何生产环境使用此脚本"
     red " *请不要有其他程序占用80和443端口"
@@ -431,6 +569,10 @@ start_menu(){
     red " 2. 卸载trojan"
     green " 3. 升级trojan"
     green " 4. 修复证书"
+    green " 5. show订阅"
+    green " 6. 清理日志"
+    green " 7. 安装ShadowSocks"
+    green " 8. 卸载ShadowSocks"
     blue " 0. 退出脚本"
     echo
     read -p "请输入数字 :" num
@@ -446,6 +588,18 @@ start_menu(){
     ;;
     4)
     repair_cert 
+    ;;
+    5)
+    showme_sub 
+    ;;
+    6)
+    clear_logs 
+    ;;
+    7)
+    install_ss 
+    ;;
+    8)
+    remove_ss 
     ;;
     0)
     exit 1
