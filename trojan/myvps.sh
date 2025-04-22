@@ -455,7 +455,8 @@ function install_ss(){
     blue "请输入SS密码"
     green "======================="
     read ss_password
-    $systemPackage install net-tools -y
+    apt install net-tools -y
+    yum install net-tools -y
     wait
     PortSS=`netstat -tlpn | awk -F '[: ]+' '$1=="tcp"{print $5}' | grep -w ${ss_port}`
     if [ -n "$PortSS" ]; then
@@ -472,19 +473,21 @@ function install_ss(){
             firewall-cmd --zone=public --add-port=$ss_port/tcp --permanent
             firewall-cmd --reload
         fi
-        $systemPackage install epel-release -y
-        $systemPackage clean all
-        $systemPackage makecache
-        $systemPackage update -y
-        $systemPackage install git gcc glibc-headers gettext autoconf libtool automake make pcre-devel asciidoc xmlto c-ares-devel libev-devel libsodium-devel mbedtls-devel -y
+        yum install epel-release -y
+        yum clean all
+        yum makecache
+        yum update -y
+        yum install git gcc glibc-headers gettext autoconf libtool automake make pcre-devel asciidoc xmlto c-ares-devel libev-devel libsodium-devel mbedtls-devel -y
+
+
     elif [ "$release" == "debian" ]; then
         ufw_status=`systemctl status ufw | grep "Active: active"`
         if [ -n "$ufw_status" ]; then
             ufw allow $ss_port/tcp
             ufw reload
         fi
-        $systemPackage update -y
-        $systemPackage install -y --no-install-recommends git libssl-dev gettext build-essential autoconf libtool libpcre3 libpcre3-dev asciidoc xmlto libev-dev libc-ares-dev automake libmbedtls-dev libsodium-dev pkg-config
+        apt update -y
+        apt install -y --no-install-recommends git libssl-dev gettext build-essential autoconf libtool libpcre3 libpcre3-dev asciidoc xmlto libev-dev libc-ares-dev automake libmbedtls-dev libsodium-dev pkg-config
     fi
     if [ ! -d "/usr/src" ]; then
         mkdir /usr/src
