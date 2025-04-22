@@ -480,7 +480,7 @@ function install_ss(){
         yum install git gcc glibc-headers gettext autoconf libtool automake make pcre-devel asciidoc xmlto c-ares-devel libev-devel libsodium-devel mbedtls-devel -y
 
 
-    elif [ "$release" == "debian" ]; then
+    elif [ "$release" == "ubuntu" ]; then
         ufw_status=`systemctl status ufw | grep "Active: active"`
         if [ -n "$ufw_status" ]; then
             ufw allow $ss_port/tcp
