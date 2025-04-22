@@ -415,9 +415,9 @@ function update_trojan(){
 }
 
 function showme_sub(){
-    port=`cat /usr/src/trojan/server.json | grep local_port | awk -F '[,]+|[ ]' '{ print $(NF-1) }'`
-    domain=`cat /usr/src/trojan/server.json | grep private.key | awk -F / '{ print $(NF-1) }'`
-    password=`cat /usr/src/trojan/server.json | grep password | head -n 1 | awk -F '["]' '{ print $(NF-1) }'`
+    port=`cat /usr/src/trojan/server.conf | grep local_port | awk -F '[,]+|[ ]' '{ print $(NF-1) }'`
+    domain=`cat /usr/src/trojan/server.conf | grep private.key | awk -F / '{ print $(NF-1) }'`
+    password=`cat /usr/src/trojan/server.conf | grep password | head -n 1 | awk -F '["]' '{ print $(NF-1) }'`
     green " ======================================="
     red "注意：下面仅仅是普通节点订阅链接，如使用clash等软件，请自行转换"
     green "你的Trojan订阅链接是：trojan://${password}@${domain}:${port}"
