@@ -86,7 +86,7 @@ else
     # Restart NetworkManager to apply the updated configuration
     sudo systemctl restart NetworkManager
 
-    echo "Port number updated to $remote_port."
+    echo "Port number updated to $remote_port"
 fi
 
 
