@@ -169,21 +169,23 @@ pnpm tauri dev
 pnpm tauri build
 
 
-
 #最好使用高版本ubuntu22.04+
 sudo apt update
 sudo apt install -y libgtk-3-dev libwebkit2gtk-4.0-dev build-essential curl git
+sudo apt install -y mingw-w64
 curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
 sudo apt install -y nodejs
 npm i -g pnpm
 go install github.com/wailsapp/wails/v2/cmd/wails@latest
 
-git clone https://github.com/GUI-for-Cores/GUI.for.SingBox.git
-cd GUI.for.SingBox/frontend
+git clone https://github.com/GUI-for-Cores/GUI.for.Clash.git
+cd GUI.for.Clash/frontend
 pnpm install
 pnpm build
 cd ..
-wails build
+wails build -platform windows/amd64
+#wails build  生成linux版本
+
 ```
 
 # 
