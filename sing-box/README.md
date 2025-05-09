@@ -181,7 +181,8 @@ cd Pandora-Box/frontend
 npm install
 npm run build
 cd ..
-wails build -tags with_gvisor
+wails build -tags with_gvisor -platform windows/amd64
+
 
 ```
 
