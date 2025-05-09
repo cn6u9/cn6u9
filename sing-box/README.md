@@ -138,10 +138,37 @@ setting run_before "node tcping | run"
 
 run 1-6
 
+```
+#windows sing-box客户端编译搭建
+```
+#build环境需要ubuntu 22.04+
+curl -fsSL https://get.pnpm.io/install.sh | sh -
+export PATH="$HOME/.local/share/pnpm:$PATH"
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
+source ~/.bashrc
+nvm install 18
+curl https://sh.rustup.rs -sSf | sh
+source $HOME/.cargo/env
+sudo apt update
+sudo apt install libwebkit2gtk-4.0-dev build-essential curl wget file libssl-dev libgtk-3-dev
+sudo apt install libglib2.0-dev pkg-config
 
 
+#项目
+git clone https://github.com/xinggaoya/sing-box-windows.git
+cd sing-box-windows
 
+pnpm install
+pnpm tauri dev
+pnpm tauri build
 
+#项目2
+git clone https://github.com/Sentsuki/fresh-box.git
+cd fresh-box
+
+pnpm install
+pnpm tauri dev
+pnpm tauri build
 ```
 
 # 
