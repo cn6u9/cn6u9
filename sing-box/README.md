@@ -139,7 +139,7 @@ setting run_before "node tcping | run"
 run 1-6
 
 ```
-#windows sing-box客户端编译搭建
+### windows sing-box客户端编译搭建
 ```
 #build环境需要ubuntu 22.04+
 curl -fsSL https://get.pnpm.io/install.sh | sh -
