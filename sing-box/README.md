@@ -141,7 +141,7 @@ run 1-6
 ```
 ### windows sing-box客户端编译搭建
 ```
-#build环境需要ubuntu 22.04+
+#build环境需要ubuntu 22.04+,下面两个项目一直编译不成功
 curl -fsSL https://get.pnpm.io/install.sh | sh -
 export PATH="$HOME/.local/share/pnpm:$PATH"
 curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
@@ -157,7 +157,6 @@ sudo apt install libglib2.0-dev pkg-config
 #项目
 git clone https://github.com/xinggaoya/sing-box-windows.git
 cd sing-box-windows
-
 pnpm install
 pnpm tauri dev
 pnpm tauri build
@@ -165,10 +164,26 @@ pnpm tauri build
 #项目2
 git clone https://github.com/Sentsuki/fresh-box.git
 cd fresh-box
-
 pnpm install
 pnpm tauri dev
 pnpm tauri build
+
+
+
+#最好使用高版本ubuntu22.04+
+sudo apt update
+sudo apt install -y libgtk-3-dev libwebkit2gtk-4.0-dev build-essential curl git
+curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+sudo apt install -y nodejs
+npm i -g pnpm
+go install github.com/wailsapp/wails/v2/cmd/wails@latest
+
+git clone https://github.com/GUI-for-Cores/GUI.for.SingBox.git
+cd GUI.for.SingBox/frontend
+pnpm install
+pnpm build
+cd ..
+wails build
 ```
 
 # 
