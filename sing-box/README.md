@@ -152,6 +152,7 @@ source $HOME/.cargo/env
 sudo apt update
 sudo apt install libwebkit2gtk-4.0-dev build-essential curl wget file libssl-dev libgtk-3-dev
 sudo apt install libglib2.0-dev pkg-config
+sudo apt install -y mingw-w64
 
 
 #项目
@@ -170,21 +171,17 @@ pnpm tauri build
 
 
 #最好使用高版本ubuntu22.04+
-sudo apt update
-sudo apt install -y libgtk-3-dev libwebkit2gtk-4.0-dev build-essential curl git
-sudo apt install -y mingw-w64
 curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
 sudo apt install -y nodejs
 npm i -g pnpm
 go install github.com/wailsapp/wails/v2/cmd/wails@latest
 
-git clone https://github.com/GUI-for-Cores/GUI.for.Clash.git
-cd GUI.for.Clash/frontend
-pnpm install
-pnpm build
+git clone https://github.com/snakem982/Pandora-Box.git
+cd Pandora-Box/frontend
+npm install
+npm run build
 cd ..
-wails build -platform windows/amd64
-#wails build  生成linux版本
+wails build -tags with_gvisor
 
 ```
 
