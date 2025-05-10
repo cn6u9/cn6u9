@@ -104,5 +104,10 @@ CGO_ENABLED=0 GOOS=windows GOARCH=amd64 wails build -tags with_gvisor --skipbind
   ]
 }
 ```
-
+bug修复
+···
+geosite,gitip换下载源  
+改名  
+结束加速，无法返回主页面  
+···
 
