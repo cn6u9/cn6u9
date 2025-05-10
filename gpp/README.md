@@ -2,12 +2,13 @@
 ```
 wget https://github.com/cn6u9/cn6u9/raw/main/gpp/gpp.tar.gz
 tar zxvf gpp.tar.gz
+cd gpp/
+go build cmd/gpp/main.go
+mv main gpp
 cd gpp/server/
 ./install.sh
 ```
 # 运行客户端
-
-[从releases下载](https://github.com/danbai225/gpp/releases)下载对应系统的客户端以管理员身份运行
 
 点击页面上的`Game`或`Http`字样弹出节点列表窗口，在下方粘贴服务端的链接完成节点导入。
 在节点列表选择你的加速节点，如何开始加速。
@@ -23,14 +24,7 @@ sudo xattr -r -d com.apple.quarantine /Applications/gpp.app
 
 # 编译
 
-## 编译服务端
 
-使用`golang`编译 `cmd/gpp/main.go`获得服务端可执行文件。
-```
-go build cmd/gpp/main.go
-mv main gpp
-
-```
 
 ## 编译GUI客户端
 
