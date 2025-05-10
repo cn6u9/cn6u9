@@ -139,10 +139,10 @@ echo "下载服务端 copy。。。"
 
 # 动态地拼接下载URL
 
-cp ./main /usr/local/gpp/gpp
+cp /root/gpp/main /usr/local/gpp/gpp
 
 
-chmod +x gpp
+chmod +x /usr/local/gpp
 
 # 创建运行脚本
 cat << EOF > run.sh
