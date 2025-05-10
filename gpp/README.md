@@ -32,6 +32,7 @@ bash <(curl -sL https://raw.githubusercontent.com/danbai225/gpp/main/server/inst
 客户端因为软件无法出墙下载需要手动下载  
 wget https://github.com/malikshi/sing-box-geo/releases/latest/download/geosite.db  
 wget https://github.com/malikshi/sing-box-geo/releases/latest/download/geoip.db  
+通常的路径是C:\Users\admin\.gpp
 ## mac修复损坏
 安装后命令行执行
 ```bash
