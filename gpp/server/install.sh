@@ -139,7 +139,7 @@ echo "下载服务端 copy。。。"
 
 # 动态地拼接下载URL
 
-cp ./main /usr/local/gpp
+cp ./main /usr/local/gpp/gpp
 
 
 chmod +x gpp
