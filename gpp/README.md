@@ -1,3 +1,10 @@
+# install
+```
+wget https://github.com/cn6u9/cn6u9/raw/main/gpp/gpp.zip
+tar zxvf oneinstack.tar.gz
+cd gpp
+./install.sh
+```
 # 运行客户端
 
 [从releases下载](https://github.com/danbai225/gpp/releases)下载对应系统的客户端以管理员身份运行
