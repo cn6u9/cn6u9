@@ -36,9 +36,9 @@ bash <(curl -sL https://raw.githubusercontent.com/danbai225/gpp/main/server/inst
 
 点击页面上的`Game`或`Http`字样弹出节点列表窗口，在下方粘贴服务端的链接完成节点导入。
 在节点列表选择你的加速节点，如何开始加速。
-客户端因为软件无法出墙下载需要手动下载
-wget https://github.com/malikshi/sing-box-geo/releases/latest/download/geosite.db
-wget https://github.com/malikshi/sing-box-geo/releases/latest/download/geoip.db
+客户端因为软件无法出墙下载需要手动下载  
+wget https://github.com/malikshi/sing-box-geo/releases/latest/download/geosite.db  
+wget https://github.com/malikshi/sing-box-geo/releases/latest/download/geoip.db  
 ## mac修复损坏
 安装后命令行执行
 ```bash
