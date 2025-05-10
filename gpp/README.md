@@ -44,7 +44,7 @@ CGO_ENABLED=0 GOOS=windows GOARCH=amd64 wails build -tags with_gvisor --skipbind
 
 ## 服务端
 
-配置存放为服务端二进制文件当前目录的`config.json`
+配置存放为服务端二进制文件当前目录的`/usr/local/gpp/config.json`
 
 - protocol 协议
 - port 端口
