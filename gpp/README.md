@@ -1,7 +1,7 @@
 # install
 ```
-wget https://github.com/cn6u9/cn6u9/raw/main/gpp/gpp.zip
-tar zxvf oneinstack.tar.gz
+wget https://github.com/cn6u9/cn6u9/raw/main/gpp/gpp.tar.gz
+tar zxvf gpp.tar.gz
 cd gpp
 ./install.sh
 ```
