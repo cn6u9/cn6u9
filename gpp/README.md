@@ -1,27 +1,6 @@
 # gpp
 
-基于[sing-box](https://github.com/SagerNet/sing-box)+[wails](https://github.com/wailsapp/wails)的加速器，使用golang编写，支持windows、linux、macos
 
-- http分流
-- gui客户端
-- 基于tun代理
-- 自定义规则
-- 使用简单
-
-
-
-# 使用教程
-
-## 服务的搭建
-
-在优质线路服务器上运行安装脚本
-快速安装服务端脚本（仅支持linux）
-```bash
-bash <(curl -sL https://raw.githubusercontent.com/danbai225/gpp/main/server/install.sh)
-```
-然后执行/usr/local/gpp/run.sh start启动服务端
-
-根据提示安装完成后会输出导入链接
 
 # 运行客户端
 
