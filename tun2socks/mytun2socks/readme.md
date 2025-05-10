@@ -1,3 +1,5 @@
+### 安装编译环境
+```
 #!/bin/bash
 
 # 安装系统依赖
@@ -33,3 +35,8 @@ echo "检查GLFW配置..."
 go get -u github.com/go-gl/glfw/v3.3/glfw
 
 echo "安装完成！现在可以运行程序了"
+```
+### build
+```
+CGO_ENABLED=1 GOOS=windows GOARCH=amd64 CC=x86_64-w64-mingw32-gcc go build
+```
