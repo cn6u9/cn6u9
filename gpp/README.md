@@ -2,7 +2,7 @@
 ```
 wget https://github.com/cn6u9/cn6u9/raw/main/gpp/gpp.tar.gz
 tar zxvf gpp.tar.gz
-cd gpp
+cd gpp/server/
 ./install.sh
 ```
 # 运行客户端
