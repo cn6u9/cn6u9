@@ -22,6 +22,7 @@ sudo xattr -r -d com.apple.quarantine /Applications/gpp.app
 ```
 go build cmd/gpp/main.go
 mv main gpp
+cp gpp /usr/local/gpp/
 ```
 
 ## 编译GUI客户端
