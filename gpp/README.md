@@ -44,6 +44,10 @@ sudo xattr -r -d com.apple.quarantine /Applications/gpp.app
 ## 编译服务端
 
 使用`golang`编译 `cmd/gpp/main.go`获得服务端可执行文件。
+```
+go build cmd/gpp/main.go
+mv main gpp
+```
 
 ## 编译GUI客户端
 
