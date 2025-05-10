@@ -8,7 +8,7 @@ import (
 	"crypto/x509"
 	"crypto/x509/pkix"
 	"encoding/pem"
-	box "github.com/sagernet/sing-box"
+	"github.com/sagernet/sing-box"
 	"github.com/sagernet/sing-box/option"
 	"github.com/sagernet/sing/common/auth"
 	"math/big"
