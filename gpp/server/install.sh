@@ -138,39 +138,9 @@ esac
 echo "下载服务端 copy。。。"
 
 # 动态地拼接下载URL
-#latest_release_url=$(curl -s https://api.github.com/repos/danbai225/gpp/releases/latest | grep "browser_download_url.*_linux_$ARCH.tar.gz" | cut -d : -f 2,3 | tr -d \")
-cp main /usr/local/gpp
-# 检查是否成功获取URL
-if [ -z "$latest_release_url" ]; then
-    echo "错误: 无法获取下载URL，请检查网络连接或手动下载。"
-    exit 1
-fi
 
-filename=$(basename $latest_release_url)
+cp ./main /usr/local/gpp
 
-echo "下载文件: $filename"
-
-curl -LO $latest_release_url
-
-if [ $? -ne 0 ]; then
-    echo "错误: 下载失败，请检查网络连接或手动下载。"
-    exit 1
-fi
-
-echo "下载完成"
-
-echo "解压文件"
-
-tar -xzf $filename gpp-server
-if [ $? -ne 0 ]; then
-    echo "错误: 解压失败。"
-    exit 1
-fi
-
-mv gpp-server gpp
-echo "解压完成"
-
-rm $filename
 
 chmod +x gpp
 
