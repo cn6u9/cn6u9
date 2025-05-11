@@ -108,7 +108,7 @@ CGO_ENABLED=0 GOOS=windows GOARCH=amd64 wails build -tags with_gvisor --skipbind
 ```
 box.go-geosite,gitip换下载源  
 改名  
-结束加速，无法返回主页面
+frontend\src\views\Index.vue-结束加速，无法返回主页面
 
 ```
 
