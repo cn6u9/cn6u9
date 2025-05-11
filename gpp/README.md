@@ -3,8 +3,8 @@
 wget https://github.com/cn6u9/cn6u9/raw/main/gpp/gpp.tar.gz
 tar zxvf gpp.tar.gz
 cd gpp/
-go build cmd/gpp/main.go
-mv main gpp
+CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags="-s -w" -o gpp ./cmd/gpp/main.go
+CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o gpp cmd/gpp/main.go
 cd gpp/server/
 ./install.sh
 ```
