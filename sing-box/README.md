@@ -184,6 +184,12 @@ cd ..
 export NODE_OPTIONS="--max-old-space-size=4096"
 CGO_ENABLED=0 GOOS=windows GOARCH=amd64 wails build -tags with_gvisor --skipbindings
 
+#需要在windows下编译linux无法编译
+#CGO_ENABLED=0 CC=x86_64-w64-mingw32-gcc GOOS=windows GOARCH=amd64 go build -ldflags="-w -s -H=windowsgui" -o cat-box.exe
+git clone https://github.com/xqd922/cat-box.git
+cd cat-box/build
+build.ps1
+
 
 ```
 
