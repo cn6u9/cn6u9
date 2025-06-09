@@ -8,6 +8,16 @@ CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o gpp cmd/gpp/main.go
 cd gpp/server/
 ./install.sh
 ```
+```
+@echo off
+
+route delete 0.0.0.0
+
+route add 35.202.20.1 mask 255.255.255.255 192.168.0.1
+
+ping -n 2 35.202.20.1
+pause
+```
 # 运行客户端
 
 点击页面上的`Game`或`Http`字样弹出节点列表窗口，在下方粘贴服务端的链接完成节点导入。
