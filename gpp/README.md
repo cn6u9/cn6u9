@@ -19,34 +19,7 @@ ping -n 2 35.202.20.1
 
 pause
 ```
-```
-@echo off
-:: 请以管理员身份运行！
 
-:: ====== 自定义参数 ======
-set ALLOW_IP=203.67.48.100
-set INTERFACE_IP=192.168.0.1
-set SUBNET_MASK=255.255.255.0
-
-:: 获取网关（我们用 INTERFACE_IP 的网段，假设网关为 .1）
-for /f "tokens=1-3 delims=." %%a in ("%INTERFACE_IP%") do (
-    set GATEWAY=%%a.%%b.%%c.1
-)
-
-echo ==============================
-echo 添加静态路由，仅允许访问 %ALLOW_IP%
-echo ==============================
-
-:: 清除默认路由（慎用！可注释掉）
-route delete 0.0.0.0
-
-:: 添加仅通往 ALLOW_IP 的路由，指向本地网关
-route add %ALLOW_IP% mask 255.255.255.255 %GATEWAY% metric 1 if 1
-
-echo 已添加静态路由到 %ALLOW_IP% ，通过网关 %GATEWAY%
-echo 注意：默认网关未配置，其它地址将不可访问
-pause
-```
 # 运行客户端
 
 点击页面上的`Game`或`Http`字样弹出节点列表窗口，在下方粘贴服务端的链接完成节点导入。
