@@ -8,15 +8,15 @@ CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o gpp cmd/gpp/main.go
 cd gpp/server/
 ./install.sh
 ```
+# 需要使用nat网卡模式,3.7.28.181是外网地址,192.168.2.2是nat网卡的网关,192.168.2.213是获得的本地ip地址
 ```
 @echo off
 
-route delete 0.0.0.0
+route delete 0.0.0.0 mask 0.0.0.0
 
-route add 35.202.20.1 mask 255.255.255.255 192.168.0.1
+route add 0.0.0.0 mask 0.0.0.0 192.168.2.213 metric 6
 
-ping -n 2 35.202.20.1
-
+route add 3.7.28.181 192.168.2.2 metric 5
 pause
 ```
 
