@@ -120,8 +120,9 @@ CGO_ENABLED=0 GOOS=windows GOARCH=amd64 wails build -tags with_gvisor --skipbind
 ```
 box.go-geosite,gitip换下载源  
 改名  
-frontend\src\views\Index.vue-结束加速，无法返回主页面.
+frontend\src\views\Index.vue-结束加速，无法返回主页面.  
 服务端生成订阅  
-
+gpp/gpp/backend/client/box.go是全局代理设置  
+gpp/gpp/backend/client/box.go.bak是自动选择国内外ip  
 ```
 
