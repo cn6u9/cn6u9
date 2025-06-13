@@ -19,6 +19,12 @@ route add 0.0.0.0 mask 0.0.0.0 192.168.2.213 metric 6
 route add 3.7.28.181 192.168.2.2 metric 5
 pause
 ```
+# 
+```
+wget https://github.com/cn6u9/cn6u9/raw/main/gpp/proxy.tar.gz
+tar zxvf proxy.tar.gz
+#开启调试模式安装就可
+```
 
 # 运行客户端
 
