@@ -1,8 +1,4 @@
 ## download
-
-
-
-
 ```
  wget -N --no-check-certificate "https://raw.githubusercontent.com/cn6u9/cn6u9/main/sing-box/install.sh" && chmod 700 /root/install.sh && /root/install.sh
 ```
@@ -559,6 +555,13 @@ yum install bison -y
 ../configure --prefix=/usr --disable-profile --enable-add-ons --with-headers=/usr/include --with-binutils=/usr/bin 
 make 
 make install
+
+```
+```
+sudo mv /etc/resolv.conf /etc/resolv.conf.bak
+sudo echo "nameserver 8.8.8.8" | sudo tee /etc/resolv.conf  # 替换为实际 DNS 服务器
+sudo systemctl stop systemd-resolved
+sudo systemctl disable systemd-resolved
 
 ```
 
