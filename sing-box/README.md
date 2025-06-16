@@ -560,6 +560,7 @@ make install
 ```
 sudo mv /etc/resolv.conf /etc/resolv.conf.bak
 sudo echo "nameserver 8.8.8.8" | sudo tee /etc/resolv.conf  # 替换为实际 DNS 服务器
+sudo echo "nameserver 1.1.1.1" | sudo tee /etc/resolv.conf  # 替换为实际 DNS 服务器
 sudo systemctl stop systemd-resolved
 sudo systemctl disable systemd-resolved
 
