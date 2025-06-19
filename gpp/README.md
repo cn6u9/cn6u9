@@ -26,10 +26,16 @@ tar zxvf proxy.tar.gz
 #开启调试模式安装就可
 ```
 ```
+wget https://github.com/cn6u9/cn6u9/raw/main/gpp/proxy3.tar.gz
+tar zxvf proxy3.tar.gz
+#开启调试模式安装就可
+```
+```
 wget https://github.com/cn6u9/cn6u9/raw/main/gpp/cookie-edit.tar.gz
 tar zxvf cookie-edit.tar.gz
 #开启调试模式安装就可
 ```
+
 
 # 运行客户端
 
