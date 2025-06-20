@@ -298,7 +298,7 @@ elif [ "$release" == "ubuntu" ]; then
 elif [ "$release" == "debian" ]; then
     apt-get update
 fi
-$systemPackage -y install  nginx wget unzip zip curl tar >/dev/null 2>&1
+$systemPackage -y install  nginx wget unzip xz-utils zip curl tar >/dev/null 2>&1
 systemctl enable nginx
 systemctl stop nginx
 green "======================="
