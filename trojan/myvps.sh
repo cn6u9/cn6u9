@@ -562,7 +562,7 @@ mkdir -p /usr/src/trojan-cert/
 
 # 安装证书
 echo "安装证书..."
-~/.acme.sh/acme.sh --installcert -d "$main_domain" --fullchainpath /usr/src/trojan-cert/fullchain.pem --keypath /usr/src/trojan-cert/privkey.pem --ecc --force
+~/.acme.sh/acme.sh --installcert -d "$main_domain" --fullchainpath /usr/src/trojan-cert/fullchain.cer --keypath /usr/src/trojan-cert/privkey.key --ecc --force
 if [ $? -ne 0 ]; then
     echo "证书安装失败，请检查错误信息。"
     exit 1
