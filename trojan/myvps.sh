@@ -111,7 +111,7 @@ EOF
     "local_addr": "127.0.0.1",
     "local_port": 1080,
     "remote_addr": "$your_domain",
-    "remote_port": 443,
+    "remote_port": 444,
     "password": [
         "$trojan_passwd"
     ],
@@ -143,7 +143,7 @@ EOF
 {
     "run_type": "server",
     "local_addr": "0.0.0.0",
-    "local_port": 443,
+    "local_port": 444,
     "remote_addr": "127.0.0.1",
     "remote_port": 80,
     "password": [
@@ -233,7 +233,7 @@ if [ -n "$nginx_status" ]; then
 fi
 $systemPackage -y install net-tools socat
 Port80=`netstat -tlpn | awk -F '[: ]+' '$1=="tcp"{print $5}' | grep -w 80`
-Port443=`netstat -tlpn | awk -F '[: ]+' '$1=="tcp"{print $5}' | grep -w 443`
+Port444=`netstat -tlpn | awk -F '[: ]+' '$1=="tcp"{print $5}' | grep -w 444`
 if [ -n "$Port80" ]; then
     process80=`netstat -tlpn | awk -F '[: ]+' '$5=="80"{print $9}'`
     red "==========================================================="
@@ -241,19 +241,19 @@ if [ -n "$Port80" ]; then
     red "==========================================================="
     exit 1
 fi
-if [ -n "$Port443" ]; then
-    process443=`netstat -tlpn | awk -F '[: ]+' '$5=="443"{print $9}'`
+if [ -n "$Port444" ]; then
+    process444=`netstat -tlpn | awk -F '[: ]+' '$5=="444"{print $9}'`
     red "============================================================="
-    red "检测到443端口被占用，占用进程为：${process443}，本次安装结束"
+    red "检测到444端口被占用，占用进程为：${process444}，本次安装结束"
     red "============================================================="
     exit 1
 fi
 CHECK=$(grep SELINUX= /etc/selinux/config | grep -v "#")
 if [ "$CHECK" != "SELINUX=disabled" ]; then
-    green "检测到SELinux开启状态，添加放行80/443端口规则"
+    green "检测到SELinux开启状态，添加放行80/444端口规则"
     yum install -y policycoreutils-python >/dev/null 2>&1
     semanage port -a -t http_port_t -p tcp 80
-    semanage port -a -t http_port_t -p tcp 443
+    semanage port -a -t http_port_t -p tcp 444
 fi
 if [ "$release" == "centos" ]; then
     if  [ -n "$(grep ' 6\.' /etc/redhat-release)" ] ;then
@@ -270,9 +270,9 @@ if [ "$release" == "centos" ]; then
     fi
     firewall_status=`firewall-cmd --state`
     if [ "$firewall_status" == "running" ]; then
-        green "检测到firewalld开启状态，添加放行80/443端口规则"
+        green "检测到firewalld开启状态，添加放行80/444端口规则"
         firewall-cmd --zone=public --add-port=80/tcp --permanent
-	firewall-cmd --zone=public --add-port=443/tcp --permanent
+	firewall-cmd --zone=public --add-port=444/tcp --permanent
 	firewall-cmd --reload
     fi
     rpm -Uvh http://nginx.org/packages/centos/7/noarch/RPMS/nginx-release-centos-7-0.el7.ngx.noarch.rpm
@@ -292,7 +292,7 @@ elif [ "$release" == "ubuntu" ]; then
     ufw_status=`systemctl status ufw | grep "Active: active"`
     if [ -n "$ufw_status" ]; then
         ufw allow 80/tcp
-        ufw allow 443/tcp
+        ufw allow 444/tcp
     fi
     apt-get update
 elif [ "$release" == "debian" ]; then
@@ -562,7 +562,7 @@ start_menu(){
     green " 系统：centos7+/debian9+/ubuntu16.04+"
     blue " 声明："
     red " *请不要在任何生产环境使用此脚本"
-    red " *请不要有其他程序占用80和443端口"
+    red " *请不要有其他程序占用80和444端口"
     red " *若是第二次使用脚本，请先执行卸载trojan"
     green " ======================================="
     echo
