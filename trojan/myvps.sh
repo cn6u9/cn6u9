@@ -721,7 +721,7 @@ start_menu(){
     green " 6. 清理日志"
     green " 7. 安装ShadowSocks"
     green " 8. 卸载ShadowSocks"
-    green " 9.my_cert申请"
+    green " 9. my_cert申请"
     blue " 0. 退出脚本"
     echo
     read -p "请输入数字 :" num
