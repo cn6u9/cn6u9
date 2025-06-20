@@ -751,7 +751,7 @@ start_menu(){
     remove_ss 
     ;;
     9)
-    remove_ss 
+    my_cert 
     ;;
     0)
     exit 1
