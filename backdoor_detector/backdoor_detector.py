@@ -137,14 +137,11 @@ class BackdoorDetector:
             })
         return matches
 
-
-
     def _get_line_context(self, content: str, line_num: int) -> List[str]:
         lines = content.splitlines()
         start = max(0, line_num - 2)
         end = min(len(lines), line_num + 1)
         return [f"line {i+1}: {lines[i]}" for i in range(start, end)]
-
 
     def _get_severity_level(self, pattern_name: str) -> str:
         for level, patterns in self.severity_levels.items():
@@ -229,10 +226,11 @@ class BackdoorDetector:
             return False
 
 def main():
-    parser = argparse.ArgumentParser(description='Backdoor Detector with context-enhanced JSON output')
+    parser = argparse.ArgumentParser(description='Backdoor Detector with context-enhanced JSON/HTML output')
     parser.add_argument('path', help='Path to file or directory to scan')
-    parser.add_argument('--output', '-o', help='Output JSON file path')
-    parser.add_argument('--whitelist', '-w', help='Custom whitelist JSON')
+    parser.add_argument('--output', '-o', help='Output file path (JSON or HTML)')
+    parser.add_argument('--whitelist', '-w', help='Custom whitelist JSON file')
+    parser.add_argument('--format', choices=['json', 'html'], default='json', help='Output format: json (default) or html')
     args = parser.parse_args()
 
     detector = BackdoorDetector()
@@ -269,9 +267,31 @@ def main():
             print(f"    Description: {d['description']}")
 
     if args.output:
-        with open(args.output, 'w') as f:
-            json.dump(results, f, indent=2)
-        print(f"\nResults saved to {args.output}")
+        if args.format == 'html':
+            with open(args.output, 'w', encoding='utf-8') as f:
+                f.write('<html><head><meta charset="utf-8"><style>code{background:#eee;padding:2px;}pre{background:#f9f9f9;padding:4px;}</style></head><body>\n')
+                for file_path, info in results.items():
+                    f.write(f"<h2>File: {file_path} ({info['language']})</h2>\n<ul>\n")
+                    for d in info['detections']:
+                        severity_color = {
+                            'critical': 'red',
+                            'high': 'orange',
+                            'medium': 'goldenrod',
+                            'low': 'gray'
+                        }.get(d['severity'], 'black')
+                        context_html = '<pre>' + '\n'.join(d['context']) + '</pre>' if isinstance(d['context'], list) else f"<pre>{d['context']}</pre>"
+                        f.write(f"<li><strong>[Line {d['line']}]</strong> "
+                                f"<span style='color:{severity_color};'>[{d['severity'].upper()}]</span> "
+                                f"<code>{d['pattern']}</code>: {d['match']}<br>"
+                                f"{d['description']}<br>"
+                                f"{context_html}</li>\n")
+                    f.write("</ul>\n")
+                f.write('</body></html>')
+            print(f"\nHTML report saved to {args.output}")
+        else:
+            with open(args.output, 'w', encoding='utf-8') as f:
+                json.dump(results, f, indent=2, ensure_ascii=False)
+            print(f"\nJSON results saved to {args.output}")
 
 if __name__ == '__main__':
     main()
