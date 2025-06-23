@@ -137,13 +137,13 @@ class BackdoorDetector:
             })
         return matches
 
-    def _get_line_context(self, content: str, line_num: int, window: int = 2) -> str:
+
+
+    def _get_line_context(self, content: str, line_num: int) -> List[str]:
         lines = content.splitlines()
-        start = max(0, line_num - 2)  # 上一行
-        end = min(len(lines), line_num + 1)  # 当前 + 下一行
-        return '\n'.join(f"line {i+1}: {lines[i]}" for i in range(start, end))
-
-
+        start = max(0, line_num - 2)
+        end = min(len(lines), line_num + 1)
+        return [f"line {i+1}: {lines[i]}" for i in range(start, end)]
 
 
     def _get_severity_level(self, pattern_name: str) -> str:
