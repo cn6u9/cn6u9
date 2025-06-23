@@ -6,3 +6,6 @@ python3 backdoor_detector.py /root/ -o out.json
 
 # 使用白名单并保存结果
 python3 backdoor_detector.py /path/to/project/ --whitelist my_whitelist.json --output results.json
+
+# 扫描整个目录，输出 HTML 报告
+python backdoor_detector.py ./src -o report.html --format html
