@@ -5,7 +5,9 @@
 ```
  wget -N --no-check-certificate "https://raw.githubusercontent.com/cn6u9/cn6u9/main/sing-box/wireguard-install.sh" && chmod 700 /root/wireguard-install.sh && /root/wireguard-install.sh
 ```
-
+```
+wget -N --no-check-certificate https://raw.githubusercontent.com/cn6u9/cn6u9/refs/heads/main/sing-box/openvpn-install.sh && chmod 700 openvpn-install.sh
+```
 ### wireguard 服务端自动改端口写文件
 ```
 #!/bin/bash
