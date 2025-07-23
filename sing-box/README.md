@@ -121,6 +121,7 @@ wget https://github.com/MetaCubeX/metacubexd/releases/download/v1.141.0/compress
 机场使用
 git clone https://github.com/hsernos/Txray.git
 GOOS=windows GOARCH=amd64 CGO_ENABLED=0 go build Txray.go
+sub rm all
 sub add http:111.111.111.11/ -r test
 sub update-node
 
