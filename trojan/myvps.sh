@@ -419,9 +419,18 @@ function showme_sub(){
     port=`cat /usr/src/trojan/server.conf | grep local_port | awk -F '[,]+|[ ]' '{ print $(NF-1) }'`
     domain=`grep 'server_name' /etc/nginx/nginx.conf | awk '{for(i=1;i<=NF;i++) if($i=="server_name") print $(i+1)}' | sed 's/;//'`
     password=`grep -A1 '"password"' /usr/src/trojan/server.conf | awk -F '"' 'NR==2 {print $2}'`
+    
+    # 构建订阅链接
+    sub_link="trojan://${password}@${domain}:${port}"
+    
+    # 写入文件
+    echo "$sub_link" > /usr/share/nginx/html/trojan_sub112233.txt
+    
+    # 终端显示
     green " ======================================="
     red "注意：下面仅仅是普通节点订阅链接，如使用clash等软件，请自行转换"
-    green "你的Trojan订阅链接是：trojan://${password}@${domain}:${port}"
+    green "你的Trojan订阅链接是：$sub_link"
+    green "已写入到 /usr/share/nginx/html/trojan_sub112233.txt"
     green " ======================================="
 }
 
