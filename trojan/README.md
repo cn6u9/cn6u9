@@ -91,8 +91,13 @@ echo "encoded_trojan_uri"
 # Write encoded Trojan URI to file
 #echo "$encoded_trojan_uri" > "$trojan_uri_file"
 echo "$random_port" > "$trojan_uri_file"
-
 echo "Encoded Trojan URI written to $trojan_uri_file"
+
+port=`cat /usr/src/trojan/server.conf | grep local_port | awk -F '[,]+|[ ]' '{ print $(NF-1) }'`
+domain=`grep 'server_name' /etc/nginx/nginx.conf | awk '{for(i=1;i<=NF;i++) if($i=="server_name") print $(i+1)}' | sed 's/;//'`
+password=`grep -A1 '"password"' /usr/src/trojan/server.conf | awk -F '"' 'NR==2 {print $2}'`    
+sub_link="trojan://${password}@${domain}:${port}"
+echo "$sub_link" > /usr/share/nginx/html/trojan_sub112233.txt
 
 systemctl restart trojan
 systemctl restart nginx
