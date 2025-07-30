@@ -98,7 +98,8 @@ domain=`grep 'server_name' /etc/nginx/nginx.conf | awk '{for(i=1;i<=NF;i++) if($
 password=`grep -A1 '"password"' /usr/src/trojan/server.conf | awk -F '"' 'NR==2 {print $2}'`    
 sub_link="trojan://${password}@${domain}:${port}"
 echo "$sub_link" > /usr/share/nginx/html/trojan_sub112233.txt
-
+url=`grep -r "server_name" /etc/nginx/ | sed -n 's/.*server_name\s*\([^ ;]*\).*/\1/p' | grep -v '^$'`
+echo "$url/trojan_sub112233.txt"
 systemctl restart trojan
 systemctl restart nginx
 
