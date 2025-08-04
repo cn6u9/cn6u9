@@ -68,6 +68,100 @@ Table of Contents
     * [Information Gathering](#information-gathering)
     * [Hash Crack](#hash-crack)
 
+# php过滤函数
+```
+<?php
+function sanitize_input($data, $allow_html = false, $check_sql = true) {
+    if (is_array($data)) {
+        foreach ($data as $key => $value) {
+            $data[$key] = sanitize_input($value, $allow_html, $check_sql);
+        }
+        return $data;
+    }
+
+    // 标准化编码
+    $data = mb_convert_encoding($data, 'UTF-8', 'UTF-8');
+    $data = html_entity_decode($data, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+
+    // 递归解码 URL 编码和 \uXXXX
+    while (preg_match('/%[0-9a-f]{2}/i', $data)) {
+        $data = urldecode($data);
+    }
+    $data = preg_replace_callback('/\\\\u([0-9a-fA-F]{4})/', function ($m) {
+        return mb_convert_encoding(pack('H*', $m[1]), 'UTF-8', 'UCS-2BE');
+    }, $data);
+
+    // 清除控制字符和非法字符
+    $data = preg_replace('/[\x00-\x1F\x7F\xA0\xAD]/u', '', $data);
+
+    // 删除注释、SQL 注入特征
+    $data = preg_replace('/\/\*.*?\*\//s', '', $data);
+    $data = preg_replace('/--.*/', '', $data);
+    $data = preg_replace('/#.*$/m', '', $data);
+
+    // SQL 关键字检测（可选）
+    if ($check_sql) {
+        $patterns = [
+            '/\b(select|insert|update|delete|drop|truncate|union|outfile|load_file|information_schema)\b/i',
+            '/\b(or|and)\s+["\']?\s*1\s*=\s*1\s*["\']?/i',
+            '/["\']\s*\|\|\s*["\']/',
+            '/\b(sleep|benchmark)\s*\(/i',
+        ];
+        foreach ($patterns as $pattern) {
+            $data = preg_replace($pattern, '', $data);
+        }
+    }
+
+    // 删除危险标签（防止绕过：如 <svg/onload=...>）
+    $black_tags = ['script', 'iframe', 'svg', 'object', 'embed', 'meta', 'link', 'style', 'form', 'input'];
+    foreach ($black_tags as $tag) {
+        $data = preg_replace("#<\s*{$tag}\b[^>]*>#is", '', $data);
+        $data = preg_replace("#<\s*/\s*{$tag}\s*>#is", '', $data);
+    }
+
+    // 删除 onload/onerror/onmouseover 等事件属性
+    $data = preg_replace('/on\w+\s*=\s*["\']?.*?["\']?/i', '', $data);
+
+    // 清除 style 属性中包含 javascript、expression 等内容
+    $data = preg_replace('/style\s*=\s*["\']?.*?(expression|javascript|url|animation)[^"\']*["\']?/i', '', $data);
+
+    // 过滤 javascript: vbscript: 等协议
+    $data = preg_replace('/(javascript:|vbscript:|data:|mocha:|livescript:|file:)/i', '', $data);
+
+    // 过滤带有 data: 协议的 img/src/href
+    $data = preg_replace('/<(img|iframe)[^>]*(src|href)\s*=\s*[\'"]?data:/i', '', $data);
+
+    // 最终处理 HTML
+    if (!$allow_html) {
+        $data = htmlspecialchars($data, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+    } else {
+        $allowed_tags = '<b><i><u><strong><em><a><p><br><ul><li><ol>';
+        $data = strip_tags($data, $allowed_tags);
+    }
+
+    return $data;
+}
+
+// 测试输入
+$test_payloads = [
+    '<svg/onload=alert(1)>',
+    '<div style="background:url(&#1;javascript:alert(1))">',
+    '<img src="x" onerror="alert`1`">',
+    "SEL/*comment*/ECT 1,2,3 FROM users",
+    "UNION%20SELECT password FROM users",
+    "1' OR 1 --",
+    '<body onload=alert(1)>',
+    '<script>alert("xss")</script>',
+    '<a href="javascript:alert(1)">click me</a>',
+];
+
+foreach ($test_payloads as $i => $payload) {
+    echo "原始输入 #$i: $payload\n";
+    echo "过滤结果  #$i: " . sanitize_input($payload) . "\n\n";
+}
+?>
+
+```
 
 # Webshell
 
