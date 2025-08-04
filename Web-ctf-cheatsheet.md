@@ -72,9 +72,9 @@ Table of Contents
 ```
 <?php
 // 开启错误显示方便调试，正式环境请关闭
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
+//ini_set('display_errors', 1);
+//ini_set('display_startup_errors', 1);
+//error_reporting(E_ALL);
 
 /**
  * 纯PHP方式将 \uXXXX 转成 UTF-8字符
