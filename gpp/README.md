@@ -26,8 +26,8 @@ tar zxvf proxy.tar.gz
 #开启调试模式安装就可
 ```
 ```
-wget https://github.com/cn6u9/cn6u9/raw/main/gpp/proxy3.tar.gz
-tar zxvf proxy3.tar.gz
+wget https://github.com/cn6u9/cn6u9/raw/main/gpp/proxymaster.tar.gz
+tar zxvf proxymaster.tar.gz
 #开启调试模式安装就可
 ```
 ```
