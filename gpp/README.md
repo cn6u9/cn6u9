@@ -40,6 +40,11 @@ wget https://github.com/cn6u9/cn6u9/raw/main/gpp/hackbar.tar.gz
 tar zxvf hackbar.tar.gz
 #开启调试模式安装就可
 ```
+```
+wget https://github.com/cn6u9/cn6u9/raw/main/gpp/fastburp.tar.gz
+tar zxvf fastburp.tar.gz
+#开启调试模式安装就可
+```
 
 
 # 运行客户端
