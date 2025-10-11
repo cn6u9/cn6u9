@@ -73,11 +73,15 @@ gui的客户端需要自建构建，需要安装`wails`、`npm`和`golang`，安
 - 安装`npm` [下载地址](https://nodejs.org/en/download/)
 - 安装`wails`，`go install github.com/wailsapp/wails/v2/cmd/wails@latest`
 
-使用`wails`编译
+使用`wails`编译windows,linux
 
 ```
 export NODE_OPTIONS="--max-old-space-size=4096"
 CGO_ENABLED=0 GOOS=windows GOARCH=amd64 wails build -tags with_gvisor --skipbindings
+```
+```
+export NODE_OPTIONS="--max-old-space-size=4096"
+CGO_ENABLED=0 GOOS=linux GOARCH=amd64 wails build -tags with_gvisor --skipbindings
 ```
 
 # config解释
