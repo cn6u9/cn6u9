@@ -64,6 +64,30 @@ sudo xattr -r -d com.apple.quarantine /Applications/gpp.app
 # 编译
 
 
+## install 环境
+```
+
+安装环境
+curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+sudo apt install -y nodejs
+npm i -g pnpm
+go install github.com/wailsapp/wails/v2/cmd/wails@latest
+export PATH=$PATH:$(go env GOPATH)/bin
+
+因为kali2025.3本地没有libwebkit2gtk4.0,需要用创建软链接
+sudo apt update
+sudo apt install libwebkit2gtk-4.1-dev build-essential curl wget file libssl-dev libgtk-3-dev
+sudo apt install libglib2.0-dev pkg-config
+
+# 查找 webkit2gtk-4.1.pc 文件位置
+find /usr -name "webkit2gtk-4.1.pc" 2>/dev/null
+
+# 通常位置在 /usr/lib/x86_64-linux-gnu/pkgconfig/ 或 /usr/share/pkgconfig/
+# 创建符号链接
+sudo ln -s /usr/lib/x86_64-linux-gnu/pkgconfig/webkit2gtk-4.1.pc /usr/lib/x86_64-linux-gnu/pkgconfig/webkit2gtk-4.0.pc
+
+
+```
 
 ## 编译GUI客户端
 
