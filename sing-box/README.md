@@ -314,6 +314,7 @@ while true; do
     # If the process is not running, start it
 cd /opt/ && /opt/pptter -p 8080 -tlsp 443 -tlsc /etc/cert/fullchain.pem -tlsk /etc/cert/privkey.pem &
 #cd /opt/ && /opt/pptter -p 8080 -tlsp 443 -tlsc /etc/v2ray-agent/tls/kuai.369.org.crt -tlsk /etc/v2ray-agent/tls/kuai.369.org.key &
+#cd /opt/ && /opt/pptter -p 8080 -tlsp 443 -tlsc /etc/v2ray-agent/tls/kuai.369.org.crt -tlsk /etc/v2ray-agent/tls/kuai.369.org.key 2>&1 | tee -a /opt/pptter.log &
   fi
 
   # Sleep for 1 second before checking again
