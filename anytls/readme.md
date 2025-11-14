@@ -6,11 +6,10 @@ git clone "https://github.com/anytls/anytls-go.git"
 cd anytls-go
 
 # 编译服务端和客户端
-print_info "编译服务端..."
-go build -o anytls-server ./cmd/server
+CGO_ENABLED=0  GOOS=linux  GOARCH=amd64 go build -o anytls-server ./cmd/server
 
-print_info "编译客户端..."
-go build -o anytls-client ./cmd/client
+
+CGO_ENABLED=0  GOOS=linux  GOARCH=amd64 go build -o anytls-client ./cmd/client
 ```
 
 ### install
