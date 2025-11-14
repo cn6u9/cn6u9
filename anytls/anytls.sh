@@ -651,7 +651,6 @@ main() {
     clear
     hr
     echo -e " AnyTLS 一键脚本"
-    echo -e " https://github.com/GeorgianaBlake/AnyTLS"
     echo -e " 当前脚本版本: ${Magenta}${SHELL_VERSION}${Font}"
     echo -e " 安装状态：$(install_status_text)"
     echo_version
