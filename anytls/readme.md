@@ -1,15 +1,3 @@
-### build
-```
-cd /tmp
-rm -rf anytls-go
-git clone "https://github.com/anytls/anytls-go.git"
-cd anytls-go
-
-# 编译服务端和客户端
-CGO_ENABLED=0  GOOS=linux  GOARCH=amd64 go build -o anytls-server ./cmd/server
-CGO_ENABLED=0  GOOS=linux  GOARCH=amd64 go build -o anytls-client ./cmd/client
-```
-
 ### install
 ```
 bash <(curl -Lso- https://raw.githubusercontent.com/cn6u9/cn6u9/refs/heads/main/anytls/anytls.sh)
