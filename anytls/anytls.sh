@@ -6,7 +6,7 @@
 
 set -euo pipefail
 
-CONFIG_DIR="/etc/AnyTLS" # 配置目录
+CONFIG_DIR="/etc/anytls" # 配置目录
 ANYTLS_SNAP_DIR="/tmp/anytls_install_$$" # 临时目录
 ANYTLS_SERVER="${CONFIG_DIR}/server" # 服务端文件
 ANYTLS_SERVICE_NAME="anytls.service" # 服务
