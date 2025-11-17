@@ -639,6 +639,40 @@ set_password() {
   exit 0
 }
 
+installgo() {
+rm -rf  /usr/local/go/
+rm -rf /usr/bin/go
+rm -rf /home/gopath/
+wget https://go.dev/dl/go1.25.2.linux-amd64.tar.gz
+tar -zxvf go1.25.2.linux-amd64.tar.gz -C /usr/local/
+ln -s /usr/local/go/bin/go /usr/bin/go
+
+cat >> /etc/profile <<EOF
+export GOROOT=/usr/local/go
+export GOBIN=$GOROOT/bin
+export PATH=$PATH:$GOBIN
+export GOPATH=/home/gopath
+EOF
+mkdir /home/gopath
+source /etc/profile
+go version
+  exit 0
+}
+
+buildanytls() {
+cd /tmp
+rm -rf anytls-go
+git clone "https://github.com/anytls/anytls-go.git"
+cd anytls-go
+
+# 编译服务端和客户端
+CGO_ENABLED=0  GOOS=linux  GOARCH=amd64 go build -o anytls-server ./cmd/server
+CGO_ENABLED=0  GOOS=linux  GOARCH=amd64 go build -o anytls-client ./cmd/client
+rm /etc/anytls/server
+cp anytls-server /etc/anytls/
+  exit 0
+}
+
 echo_version() {
   if ! is_installed; then
     return 0
@@ -661,6 +695,8 @@ main() {
     echo -e "${Cyan}4. 卸载 AnyTLS${Font}"
     echo -e "${Cyan}5. 更改端口${Font}"
     echo -e "${Cyan}6. 更改密码${Font}"
+    echo -e "${Cyan}7. 安装go${Font}"
+    echo -e "${Cyan}8. 编译anytls${Font}"
     echo -e "${Cyan}0. 退出${Font}"
     hr
       read -p "请输入数字 [0-6]: " choice
@@ -671,6 +707,8 @@ main() {
       4) uninstall_anytls; quit ;;
       5) set_port; quit ;;
       6) set_password; quit ;;
+      7) installgo; quit ;;
+      8) buildanytls; quit ;;
       0) exit 0 ;;
       *) echo "无效选项"; pause ;;
     esac
