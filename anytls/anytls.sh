@@ -640,23 +640,25 @@ set_password() {
 }
 
 installgo() {
-rm -rf  /usr/local/go/
-rm -rf /usr/bin/go
-rm -rf /home/gopath/
-wget https://go.dev/dl/go1.25.2.linux-amd64.tar.gz
-tar -zxvf go1.25.2.linux-amd64.tar.gz -C /usr/local/
-ln -s /usr/local/go/bin/go /usr/bin/go
 
-cat >> /etc/profile <<EOF
+    
+    # 下载并安装 Go
+    wget https://go.dev/dl/go1.25.2.linux-amd64.tar.gz
+    tar -zxvf go1.25.2.linux-amd64.tar.gz -C /usr/local/
+    ln -s /usr/local/go/bin/go /usr/bin/go
+
+    # 配置环境变量
+    cat >> /etc/profile <<EOF
 export GOROOT=/usr/local/go
-export GOBIN=$GOROOT/bin
-export PATH=$PATH:$GOBIN
+export GOBIN=\$GOROOT/bin
+export PATH=\$PATH:\$GOBIN
 export GOPATH=/home/gopath
 EOF
-mkdir /home/gopath
-source /etc/profile
-go version
-  exit 0
+    
+    mkdir -p /home/gopath
+    source /etc/profile
+    go version
+    exit 0
 }
 
 buildanytls() {
