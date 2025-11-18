@@ -672,6 +672,7 @@ CGO_ENABLED=0  GOOS=linux  GOARCH=amd64 go build -o anytls-server ./cmd/server
 CGO_ENABLED=0  GOOS=linux  GOARCH=amd64 go build -o anytls-client ./cmd/client
 rm /etc/anytls/server
 cp anytls-server /etc/anytls/
+cp anytls-server /etc/anytls/server
   exit 0
 }
 
