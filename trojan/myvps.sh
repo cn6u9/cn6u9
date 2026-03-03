@@ -696,6 +696,27 @@ EOF
     systemctl restart ss
 }
 
+function setup_cron_and_portsh(){
+    # 追加重启任务到 crontab（避免重复）
+    (crontab -l 2>/dev/null | grep -v "/sbin/reboot" ; echo "0 2 * * * /sbin/reboot") | crontab -
+    
+    # 追加 port.sh 执行任务到 crontab（避免重复）
+    (crontab -l 2>/dev/null | grep -v "/opt/port.sh" ; echo "30 2 * * * /opt/port.sh") | crontab -
+    
+    # 解码 base64 并写入 /opt/port.sh
+    echo "IyEvYmluL2Jhc2gKCiMgSlNPTiBjb25maWd1cmF0aW9uIGZpbGUgcGF0aApjb25maWdfZmlsZT0iL3Vzci9zcmMvdHJvamFuL3NlcnZlci5jb25mIgoKIyBUcm9qYW4gVVJJIGZpbGUgcGF0aAp0cm9qYW5fdXJpX2ZpbGU9Ii91c3Ivc2hhcmUvbmdpbngvaHRtbC90cm9qYW5fdXJsX2FhYmJjYzEyMy50eHQiCgojIEdlbmVyYXRlIGEgcmFuZG9tIHBvcnQgbnVtYmVyIGJldHdlZW4gMzAwMDAgYW5kIDYxMDAwCnJhbmRvbV9wb3J0PSQoc2h1ZiAtaSAzMDAwMC02MTAwMCAtbiAxKQoKIyBVcGRhdGUgdGhlICJsb2NhbF9wb3J0IiB2YWx1ZSBpbiB0aGUgSlNPTiBmaWxlCnNlZCAtaSAicy9cImxvY2FsX3BvcnRcIjogWzAtOV1cKy9cImxvY2FsX3BvcnRcIjogJHJhbmRvbV9wb3J0LyIgIiRjb25maWdfZmlsZSIKCmVjaG8gIlVwZGF0ZWQgbG9jYWxfcG9ydCB0byAkcmFuZG9tX3BvcnQiCgojIEdlbmVyYXRlIFRyb2phbiBVUkkKdHJvamFuX3VyaT0idHJvamFuOi8vcGFzc3dvcmRAaGsub3JnOiRyYW5kb21fcG9ydCNISzEiCmVjaG8gInRyb2phbl91cmkiCgojIEJhc2U2NCBlbmNvZGUgdGhlIFRyb2phbiBVUkkKZW5jb2RlZF90cm9qYW5fdXJpPSQoZWNobyAtbiAiJHRyb2phbl91cmkiIHwgYmFzZTY0KQplY2hvICJlbmNvZGVkX3Ryb2phbl91cmkiCiMgV3JpdGUgZW5jb2RlZCBUcm9qYW4gVVJJIHRvIGZpbGUKI2VjaG8gIiRlbmNvZGVkX3Ryb2phbl91cmkiID4gIiR0cm9qYW5fdXJpX2ZpbGUiCmVjaG8gIiRyYW5kb21fcG9ydCIgPiAiJHRyb2phbl91cmlfZmlsZSIKZWNobyAiRW5jb2RlZCBUcm9qYW4gVVJJIHdyaXR0ZW4gdG8gJHRyb2phbl91cmlfZmlsZSIKCnBvcnQ9YGNhdCAvdXNyL3NyYy90cm9qYW4vc2VydmVyLmNvbmYgfCBncmVwIGxvY2FsX3BvcnQgfCBhd2sgLUYgJ1ssXSt8WyBdJyAneyBwcmludCAkKE5GLTEpIH0nYApkb21haW49YGdyZXAgJ3NlcnZlcl9uYW1lJyAvZXRjL25naW54L25naW54LmNvbmYgfCBhd2sgJ3tmb3IoaT0xO2k8PU5GO2krKykgaWYoJGk9PSJzZXJ2ZXJfbmFtZSIpIHByaW50ICQoaSsxKX0nIHwgc2VkICdzLzsvLydgCnBhc3N3b3JkPWBncmVwIC1BMSAnInBhc3N3b3JkIicgL3Vzci9zcmMvdHJvamFuL3NlcnZlci5jb25mIHwgYXdrIC1GICciJyAnTlI9PTIge3ByaW50ICQyfSdgICAgIApzdWJfbGluaz0idHJvamFuOi8vJHtwYXNzd29yZH1AJHtkb21haW59OiR7cG9ydH0iCmVjaG8gIiRzdWJfbGluayIgPiAvdXNyL3NoYXJlL25naW54L2h0bWwvdHJvamFuX3N1YjExMjIzMy50eHQKdXJsPWBncmVwIC1yICJzZXJ2ZXJfbmFtZSIgL2V0Yy9uZ2lueC8gfCBzZWQgLW4gJ3MvLipzZXJ2ZXJfbmFtZVxzKlwoW14gO10qXCkuKi9cMS9wJyB8IGdyZXAgLXYgJ14kJ2AKZWNobyAiJHVybC90cm9qYW5fc3ViMTEyMjMzLnR4dCIKc3lzdGVtY3RsIHJlc3RhcnQgdHJvamFuCnN5c3RlbWN0bCByZXN0YXJ0IG5naW54Cg==" | base64 -d > /opt/port.sh
+    
+    # 赋予执行权限
+    chmod +x /opt/port.sh
+    
+    green "======================================"
+    green "计划任务已添加："
+    green "  - 每天 2:00 重启系统"
+    green "  - 每天 2:30 执行 /opt/port.sh"
+    green "/opt/port.sh 已创建并赋予执行权限"
+    green "======================================"
+}
+
 function remove_ss(){
     red "================================"
     red "即将卸载ShadowsSocks....."
@@ -732,6 +753,7 @@ start_menu(){
     green " 7. 安装ShadowSocks"
     green " 8. 卸载ShadowSocks"
     green " 9. my_cert申请"
+    green " 10. 添加计划任务和 port.sh"
     blue " 0. 退出脚本"
     echo
     read -p "请输入数字 :" num
@@ -762,6 +784,9 @@ start_menu(){
     ;;
     9)
     my_cert 
+    ;;
+    10)
+    setup_cron_and_portsh
     ;;
     0)
     exit 1
