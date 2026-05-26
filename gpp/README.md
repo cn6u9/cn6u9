@@ -1,13 +1,4 @@
-# install
-```
-wget https://github.com/cn6u9/cn6u9/raw/main/gpp/gpp.tar.gz
-tar zxvf gpp.tar.gz
-cd gpp/
-CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags="-s -w" -tags with_quic -o gpp ./cmd/gpp/main.go
-CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -tags with_quic -o gpp cmd/gpp/main.go
-cd gpp/server/
-./install.sh
-```
+
 # 需要使用nat网卡模式,3.7.28.181是外网地址,192.168.2.2是nat网卡的网关,192.168.2.213是获得的本地ip地址
 ```
 @echo off
