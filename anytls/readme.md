@@ -9,8 +9,13 @@ bash anytls.sh
 ```
 ### client
 ```
-wget https://github.com/anytls/anytls-go/releases/download/v0.0.11/anytls_0.0.11_linux_amd64.zip
-unzip anytls_0.0.11_linux_amd64.zip
-cp anytls-client /usr/bin
-/usr/bin/anytls-client -l 127.0.0.1:7893 -s 服务器ip:端口 -p 密码 &
+# 用法:
+#   bash anytls-client.sh run      # 执行一次
+#   bash anytls-client daemon   # 守护运行，每3小时一次
+#   bash anytls-client stop     # 停止所有客户端
+#   bash anytls-client status   # 查看当前状态
+wget https://raw.githubusercontent.com/cn6u9/cn6u9/refs/heads/main/anytls/anytls_client.sh
+chmod +x anytls_client.sh
+bash anytls_client.sh --help
+
 ```
