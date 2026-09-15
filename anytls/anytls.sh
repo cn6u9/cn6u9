@@ -1,722 +1,465 @@
-#!/usr/bin/env bash
-# https://github.com/GeorgianaBlake/AnyTLS
-# AnyTLS一键管理脚本：安装/更新/查看/更改端口/更改密码/删除
-# 适配 Debian/Ubuntu (apt) 与 CentOS/RHEL/Alma/Rocky
-# 兼容 arm64 和 amd64 两种系统架构
+#!/bin/bash
+# ============================================================
+# AnyTLS-Go 自动安装 + 订阅生成 + 每日端口轮换脚本
+# 适用系统: Debian/Ubuntu/CentOS 等主流 Linux
+# 需要 root 权限运行
+# 用法:
+#   ./install_anytls.sh              安装
+#   ./install_anytls.sh uninstall    卸载
+# ============================================================
 
-set -euo pipefail
+set -e
 
-CONFIG_DIR="/etc/anytls" # 配置目录
-ANYTLS_SNAP_DIR="/tmp/anytls_install_$$" # 临时目录
-ANYTLS_SERVER="${CONFIG_DIR}/server" # 服务端文件
-ANYTLS_SERVICE_NAME="anytls.service" # 服务
-ANYTLS_SERVICE_FILE="/etc/systemd/system/${ANYTLS_SERVICE_NAME}" # 服务目录
-ANYTLS_CONFIG_FILE="${CONFIG_DIR}/config.yaml" # 主配置文件
-ANYTLS_CLIENT_FILE="${CONFIG_DIR}/anytls.txt" # 主配置文件导出
-TZ_DEFAULT="Asia/Shanghai" # 默认时区
-SHELL_VERSION="0.1.0" # 版本
-ANYTLS_VERSION="0.0.8" # AnyTLS版本
-AT_ALIASES="AT_GeorgianaBlake" # AnyTLS别名
+# ---------- 可修改配置 ----------
+SUB_HTTP_PORT=9119                    # 订阅 HTTP 服务监听端口
+SUB_DIR="/var/www/anytls-sub"         # 订阅文件存放目录
+ANYTLS_BIN="/usr/local/bin/anytls-server"
+CONFIG_FILE="/etc/anytls/config.env"  # 保存端口和密码
+SERVICE_FILE="/etc/systemd/system/anytls.service"
+SUB_SERVICE_FILE="/etc/systemd/system/anytls-sub.service"
+CRON_SCRIPT="/usr/local/bin/anytls-rotate.sh"
+# ---------------------------------
 
-# 字体颜色配置
-Font="\033[0m"
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+NC='\033[0m'
 
-Black="\033[30m"   # 黑色
-Red="\033[31m"     # 红色
-Green="\033[32m"   # 绿色
-Yellow="\033[33m"  # 黄色
-Blue="\033[34m"    # 蓝色
-Magenta="\033[35m" # 紫/洋红
-Cyan="\033[36m"    # 青
-White="\033[37m"   # 白色
+log_info()  { echo -e "${GREEN}[INFO]${NC} $1"; }
+log_warn()  { echo -e "${YELLOW}[WARN]${NC} $1"; }
+log_error() { echo -e "${RED}[ERROR]${NC} $1"; }
 
-BBlack="\033[90m"
-BRed="\033[91m"
-BGreen="\033[92m"
-BYellow="\033[93m"
-BBlue="\033[94m"
-BMagenta="\033[95m"
-BCyan="\033[96m"
-BWhite="\033[97m"
-
-BlackBG="\033[40m"
-RedBG="\033[41m"
-GreenBG="\033[42m"
-YellowBG="\033[43m"
-BlueBG="\033[44m"
-MagentaBG="\033[45m"
-CyanBG="\033[46m"
-WhiteBG="\033[47m"
-
-Bold="\033[1m"
-Dim="\033[2m"
-Italic="\033[3m"
-Underline="\033[4m"
-Blink="\033[5m"
-Reverse="\033[7m"
-Hidden="\033[8m"
-Strike="\033[9m"
-
-OK="${Green}[OK]${Font}"
-ERROR="${Red}[ERROR]${Font}"
-WARN="${Yellow}[WARN]${Font}"
-INFO="${Cyan}[INFO]${Font}"
-
-print_ok() {
-  echo -e "${OK}${Blue} $1 ${Font}"
-}
-
-print_info() {
-  echo -e "${INFO}${Cyan} $1 ${Font}"
-}
-
-print_error() {
-  echo -e "${ERROR} ${RedBG} $1 ${Font}"
-}
-
-judge() {
-  if [[ 0 -eq $? ]]; then
-    print_ok "$1 完成"
-    sleep 1
-  else
-    print_error "$1 失败"
+# ---------- 检查 root ----------
+if [[ $EUID -ne 0 ]]; then
+    log_error "请使用 root 权限运行此脚本 (sudo ./install_anytls.sh)"
     exit 1
-  fi
-}
+fi
 
-trap 'echo -e "\n${WARN} 已中断"; exit 1' INT
-
-ensure_root() {
-  if [[ $EUID -ne 0 ]]; then
-    clear
-    echo "Error: 必须使用 root 运行本脚本!" 1>&2
-    exit 1
-  fi
-}
-
-has_cmd() { command -v "$1" >/dev/null 2>&1; }
-
-get_arch() {
-  local arch_raw
-  arch_raw=$(uname -m)
-
-  case "$arch_raw" in
-    x86_64 | amd64)
-      echo "amd64"
-      ;;
-    # i386 | i686)
-    #   echo "386"
-    #   ;;
-    aarch64 | arm64)
-      echo "arm64"
-      ;;
-    # armv7l | armv7)
-    #   echo "armv7"
-    #   ;;
-    # armv6l | armv6)
-    #   echo "armv6"
-    #   ;;
-    # ppc64le)
-    #   echo "ppc64le"
-    #   ;;
-    # mips64)
-    #   echo "mips64"
-    #   ;;
-    # mips64el)
-    #   echo "mips64le"
-    #   ;;
-    # riscv64)
-    #   echo "riscv64"
-    #   ;;
-    # s390x)
-    #   echo "s390x"
-    #   ;;
-    *)
-      print_error "不支持的系统架构 ($arch_raw)" >&2
-      return 1
-      ;;
-  esac
-}
-
-
-os_install() {
-  if command -v apt-get >/dev/null 2>&1; then
-    apt-get update -y
-    apt-get install -y ca-certificates unzip
-  elif command -v dnf >/dev/null 2>&1; then
-    dnf update -y
-    dnf install -y ca-certificates unzip
-  elif command -v yum >/dev/null 2>&1; then
-    yum update -y
-    yum install -y ca-certificates unzip
-  else
-    echo "未识别的包管理器，请手动安装 ca-certificates、unzip 后重试"
-    exit 1
-  fi
-}
-
-pause() { read -rp "按回车返回菜单..." _; }
-
-quit() { exit 0; }
-
-hr() { printf '%*s\n' 40 '' | tr ' ' '='; }
-
-emxxx() {
-  echo ".."
-}
-
-# 关闭各类防火墙
-close_wall() {
-  for svc in firewalld nftables ufw; do
-    if systemctl list-unit-files | grep -q "^${svc}.service"; then
-      # 检查状态
-      if systemctl is-active --quiet "$svc"; then
-        systemctl stop "$svc" 2>/dev/null || true
-        systemctl disable "$svc" 2>/dev/null || true
-        print_ok "已关闭并禁用防火墙: $svc"
-      else
-        print_ok "防火墙 $svc 已存在，但当前处于关闭状态"
-        # 如果还在 enabled，就禁用掉
-        if systemctl is-enabled --quiet "$svc"; then
-          systemctl disable "$svc" 2>/dev/null || true
-          print_ok "已禁用开机自启: $svc"
-        fi
-      fi
+# ---------- 安装依赖 ----------
+install_deps() {
+    log_info "安装依赖..."
+    if command -v apt-get &>/dev/null; then
+        apt-get update -qq
+        apt-get install -y -qq wget unzip curl cron python3 2>/dev/null
+    elif command -v yum &>/dev/null; then
+        yum install -y -q wget unzip curl cronie python3 2>/dev/null
+        systemctl enable crond 2>/dev/null || true
+    elif command -v dnf &>/dev/null; then
+        dnf install -y -q wget unzip curl cronie python3 2>/dev/null
+        systemctl enable crond 2>/dev/null || true
     else
-      print_error "未找到防火墙: $svc"
+        log_error "不支持的包管理器，请手动安装 wget/unzip/curl/cron/python3"
+        exit 1
     fi
-  done
+    log_info "依赖安装完成"
 }
 
-urlencode() {
-  local s="$1"
-  local i c
-  for (( i=0; i<${#s}; i++ )); do
-    c=${s:$i:1}
-    case "$c" in
-      [a-zA-Z0-9.~_-]) printf '%s' "$c" ;;
-      *) printf '%%%02X' "'$c" ;;
+# ---------- 检测架构 ----------
+detect_arch() {
+    local arch=$(uname -m)
+    case "$arch" in
+        x86_64|amd64) echo "amd64" ;;
+        aarch64|arm64) echo "arm64" ;;
+        *) log_error "不支持的架构: $arch"; exit 1 ;;
     esac
-  done
 }
 
-random_port() { shuf -i 2000-65000 -n 1; }
+# ---------- 下载 anytls-server ----------
+download_anytls() {
+    local arch=$(detect_arch)
+    log_info "检测到架构: $arch"
 
-gen_password() { cat /proc/sys/kernel/random/uuid; }
+    # 获取最新版本 tag
+    local latest_tag=$(curl -sL https://api.github.com/repos/anytls/anytls-go/releases/latest | grep '"tag_name"' | cut -d'"' -f4)
+    if [[ -z "$latest_tag" ]]; then
+        log_warn "无法获取最新版本，回退到 v0.0.13"
+        latest_tag="v0.0.13"
+    fi
+    log_info "使用版本: $latest_tag"
 
-# 确保端口是数字并且在合法范围内
-valid_port() {
-  local p="${1:-}"
-  [[ "$p" =~ ^[0-9]+$ ]] && (( p >= 1 && p <= 65535 ))
-}
+    local version="${latest_tag#v}"
+    local zip_name="anytls_${version}_linux_${arch}.zip"
+    local download_url="https://github.com/anytls/anytls-go/releases/download/${latest_tag}/${zip_name}"
 
-# 检查端口是否被占用
-is_port_used() {
-  local port="$1"
-  if command -v ss >/dev/null 2>&1; then
-    ss -tuln | awk '{print $5}' | grep -Eq "[:.]${port}([[:space:]]|$)"
-  elif command -v lsof >/dev/null 2>&1; then
-    lsof -i :"$port" -sTCP:LISTEN >/dev/null 2>&1
-  elif command -v netstat >/dev/null 2>&1; then
-    netstat -tuln 2>/dev/null | awk '{print $4}' | grep -Eq "[:.]${port}$"
-  else
-    return 1
-  fi
-}
+    local tmp_dir=$(mktemp -d)
+    cd "$tmp_dir"
 
-read_port_interactive() {
-  local input
-  while true; do
-    read -t 15 -p "回车或等待15秒为随机端口，或者自定义端口请输入(1-65535)：" input || true
-    if [[ -z "${input:-}" ]]; then
-      input=$(random_port)
+    log_info "下载 $zip_name ..."
+    if ! curl -sL -o "$zip_name" "$download_url"; then
+        log_error "下载失败，请检查网络"
+        exit 1
     fi
 
-    # 验证端口是否合法
-    if ! valid_port "$input"; then
-      echo "端口不合法：$input，请输入一个有效的端口（1-65535）。"
-      continue
+    unzip -o -q "$zip_name"
+
+    # 查找二进制文件
+    local bin_path=$(find . -name "anytls-server" -type f | head -1)
+    if [[ -z "$bin_path" ]]; then
+        log_error "未找到 anytls-server 二进制文件"
+        exit 1
     fi
 
-    # 检查端口是否被占用
-    if is_port_used "$input"; then
-      echo "端口 $input 已被占用，请选择另一个端口。"
-      continue
-    fi
-
-    # 如果端口合法且未被占用，退出循环
-    echo "$input"
-    break
-  done
+    cp "$bin_path" "$ANYTLS_BIN"
+    chmod +x "$ANYTLS_BIN"
+    cd /
+    rm -rf "$tmp_dir"
+    log_info "anytls-server 已安装到 $ANYTLS_BIN"
 }
 
-get_ip() {
-  local ip4 ip6
-  ip4=$(curl -s -4 http://www.cloudflare.com/cdn-cgi/trace | awk -F= '/^ip=/{print $2}')
-  if [[ -n "${ip4}" ]]; then
-    echo "${ip4}"
-    return
-  fi
-  ip6=$(curl -s -6 http://www.cloudflare.com/cdn-cgi/trace | awk -F= '/^ip=/{print $2}')
-  if [[ -n "${ip6}" ]]; then
-    echo "${ip6}"
-    return
-  fi
-  curl -s https://api.ipify.org || true
+# ---------- 生成随机端口和密码 ----------
+generate_config() {
+    local port=$(shuf -i 10000-65000 -n 1)
+    local password=$(tr -dc 'A-Za-z0-9' < /dev/urandom | head -c 32)
+
+    mkdir -p /etc/anytls
+    cat > "$CONFIG_FILE" << EOF
+ANYTLS_PORT=$port
+ANYTLS_PASSWORD=$password
+EOF
+    chmod 600 "$CONFIG_FILE"
+
+    log_info "随机端口: $port"
+    log_info "随机密码: $password"
 }
 
-# 获取版本
-get_latest_version() {
-  local version
-  version=$(curl -s https://api.github.com/repos/anytls/anytls-go/releases/latest \
-    | grep '"tag_name":' \
-    | sed -E 's/.*"([^"]+)".*/\1/')
+# ---------- 创建 anytls systemd 服务 ----------
+create_service() {
+    local port=$(grep ANYTLS_PORT "$CONFIG_FILE" | cut -d= -f2)
+    local password=$(grep ANYTLS_PASSWORD "$CONFIG_FILE" | cut -d= -f2)
 
-  if [[ -z "$version" ]]; then
-    print_error "无法获取AnyTLS最新版本号，请检查网络或GitHub API限制" >&2
-    return 1
-  fi
-  echo "$version"
-}
-
-# 获取已安装的版本
-get_install_version() {
-  if [[ -f "$ANYTLS_SERVICE_FILE" ]]; then
-    grep '^X-AT-Version=' "$ANYTLS_SERVICE_FILE" | sed -E 's/^X-AT-Version=//'
-  else
-    echo "unknown"
-  fi
-}
-
-write_systemd() {
-  local version port pass
-  port="$2"
-  pass="$3"
-  if [[ ${1-} =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-    version="$1"
-  else
-    version="$(get_install_version)"
-  fi
-  cat > "$ANYTLS_SERVICE_FILE" << EOF
+    cat > "$SERVICE_FILE" << EOF
 [Unit]
-Description=AnyTLS Server Service
-Documentation=https://github.com/anytls/anytls-go
-After=network.target network-online.target
-Wants=network-online.target
-X-AT-Version=${version}
+Description=AnyTLS Server
+After=network.target
 
 [Service]
 Type=simple
 User=root
-Environment=TZ=${TZ_DEFAULT}
-ExecStart="${ANYTLS_SERVER}" -l 0.0.0.0:${port} -p "${pass}"
-Restart=on-failure
-RestartSec=10s
-LimitNOFILE=65535
-StandardOutput=journal
-StandardError=journal
+ExecStart=$ANYTLS_BIN -l 0.0.0.0:$port -p $password
+Restart=always
+RestartSec=5
 
 [Install]
 WantedBy=multi-user.target
 EOF
-}
 
-write_config() {
-  # 参数：端口 密码
-  local port="$1" pass="$2"
-  mkdir -p "$(dirname "${ANYTLS_CONFIG_FILE}")"
-  cat > "${ANYTLS_CONFIG_FILE}" <<EOF
-listen: :${port}
-auth:
-  type: password
-  password: ${pass}
-EOF
-}
+    systemctl daemon-reload
+    systemctl enable anytls
+    systemctl restart anytls
+    sleep 2
 
-client_export() {
-  if [[ ! -f "${ANYTLS_CONFIG_FILE}" ]]; then
-    print_error "未找到 ${ANYTLS_CONFIG_FILE}"
-    return 1
-  fi
-  local port pass ip link
-  port=$(sed -nE 's/^[[:space:]]*listen:[[:space:]]*.*:([0-9]+)[[:space:]]*$/\1/p' "${ANYTLS_CONFIG_FILE}")
-  if [[ -z "${port}" ]]; then
-    port=$(awk '/^[[:space:]]*listen:/ { if (match($0, /:([0-9]+)[[:space:]]*$/, a)) print a[1] }' "${ANYTLS_CONFIG_FILE}")
-  fi
-  pass=$(sed -nE 's/^[[:space:]]*password:[[:space:]]*(.*)$/\1/p' "${ANYTLS_CONFIG_FILE}")
-  ip=$(get_ip)
-  local alias_enc
-  alias_enc=$(urlencode "${AT_ALIASES}")
-  link="${pass}@${ip}:${port}/?insecure=1#${alias_enc}"
-
-  echo -e "=========== AnyTLS 配置参数 ==========="
-  echo -e " 代理模式: AnyTLS"
-  echo -e " 地址: ${ip}"
-  echo -e " 端口: ${port}"
-  echo -e " 密码: ${pass}"
-  echo -e " 传输协议: tls"
-  echo -e " 跳过证书验证: true"
-  echo -e " 备注: AnyTLS 使用自签名证书, 客户端需启用 '允许不安全' 或 '跳过证书验证'"
-  echo -e "========================================="
-  echo -e " URL链接(可复制导入):"
-  echo -e " anytls://${link}"
-  echo -e "========================================="
-  echo -e " URL二维码(可在浏览器打开):"
-  echo -e " https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=anytls://${link}"
-  echo -e "========================================="
-}
-
-start_service() { print_info "正在启动 AnyTLS 服务..."; systemctl start "${ANYTLS_SERVICE_NAME}"; sleep 1; status_service; }
-stop_service() { print_info "正在停止 AnyTLS 服务..."; systemctl stop "${ANYTLS_SERVICE_NAME}"; sleep 1; status_service; }
-# restart_service() { print_info "正在重启 AnyTLS 服务..."; systemctl restart "${ANYTLS_SERVICE_NAME}"; sleep 1; status_service; }
-status_service() { print_info "AnyTLS 服务状态:"; systemctl status "${ANYTLS_SERVICE_NAME}" --no-pager; }
-log_service() { print_info "显示 AnyTLS 服务日志 (按 Ctrl+C 退出):"; journalctl -u "${ANYTLS_SERVICE_NAME}" -f "$@"; }
-
-# 是否存在可执行与服务文件
-binary_exists() { [[ -x "${ANYTLS_SERVER}" ]]; }
-service_file_exists() { systemctl cat "${ANYTLS_SERVICE_NAME}" >/dev/null 2>&1 || [[ -f "${ANYTLS_SERVICE_FILE}" ]]; }
-
-# 是否已安装：二选一即可算“已安装”
-is_installed() { binary_exists || service_file_exists; }
-
-# 是否正在运行
-is_active() { systemctl is-active "${ANYTLS_SERVICE_NAME}" >/dev/null 2>&1; }
-
-install_status_text() {
-  if is_installed; then
-    if is_active; then
-      echo -e "${BGreen}已安装（运行中）${Font}"
+    if systemctl is-active --quiet anytls; then
+        log_info "AnyTLS 服务已启动"
     else
-      # 进一步分辨 failed / inactive
-      if systemctl is-failed "${ANYTLS_SERVICE_NAME}" >/dev/null 2>&1; then
-        echo -e "${BYellow}已安装（已停止，上次启动失败）${Font}"
-      else
-        echo -e "${BYellow}已安装（已停止）${Font}"
-      fi
+        log_error "AnyTLS 服务启动失败，请检查日志: journalctl -u anytls -n 50"
+        exit 1
     fi
-  else
-    echo -e "${BRed}未安装${Font}"
-  fi
 }
 
-restart_service() {
-  systemctl daemon-reload || true
-  systemctl enable "${ANYTLS_SERVICE_NAME}" || true
-  systemctl restart "${ANYTLS_SERVICE_NAME}"
-  systemctl status --no-pager "${ANYTLS_SERVICE_NAME}" | sed -n '1,6p' || true
-}
+# ---------- 创建订阅 HTTP systemd 服务 ----------
+create_sub_service() {
+    log_info "创建订阅 HTTP 服务 (systemd)..."
 
-install_anytls() {
-  mkdir -p "$CONFIG_DIR"
+    # 确保目录存在
+    mkdir -p "$SUB_DIR"
+    touch "$SUB_DIR/index.html"   # 阻止 python http.server 列目录
 
-  print_info "正在下载依赖..."
-  os_install
-  judge "依赖下载"
+    # 获取 python3 绝对路径
+    local PYTHON_BIN=$(command -v python3)
+    if [[ -z "$PYTHON_BIN" ]]; then
+        log_error "未找到 python3，请检查依赖安装"
+        exit 1
+    fi
 
-  print_info "正在关闭防火墙..."
-  close_wall
-  judge "关闭防火墙"
-  
-  print_info "正在检测系统架构..."
-  ARCH=$(get_arch) || exit 1
+    cat > "$SUB_SERVICE_FILE" << EOF
+[Unit]
+Description=AnyTLS Subscription HTTP Server
+After=network.target
 
-  echo -e "${INFO} 检测到系统架构: ${Green}${ARCH}${Font}"
+[Service]
+Type=simple
+WorkingDirectory=$SUB_DIR
+ExecStart=$PYTHON_BIN -m http.server $SUB_HTTP_PORT --bind 0.0.0.0
+Restart=always
+RestartSec=3
+User=root
 
-  LATEST=$(get_latest_version) || exit 1
-
-  sleep 1
-  print_info "正在下载AnyTLS..."
-
-  AT_URL="https://github.com/anytls/anytls-go/releases/download/${LATEST}/anytls_${LATEST#v}_linux_${ARCH}.zip"
-
-  print_info "AnyTLS最新版本 ${LATEST}"
-
-  if [ ! -d "$ANYTLS_SNAP_DIR" ];then
-    mkdir -p "$ANYTLS_SNAP_DIR"
-  fi
-
-  FILENAME="anytls_${LATEST#v}_linux_${ARCH}.zip"
-  OUTPUT_PATH="${ANYTLS_SNAP_DIR}/${FILENAME}"
-
-  curl -L -o "$OUTPUT_PATH" "$AT_URL"
-
-  if [ $? -ne 0 ]; then
-    print_error "下载失败AnyTLS" >&2
-    exit 1
-  fi
-
-  judge "下载AnyTLS"
-  unzip -o "$OUTPUT_PATH" -d "$ANYTLS_SNAP_DIR"
-
-  mv "${ANYTLS_SNAP_DIR}/anytls-server" "$ANYTLS_SERVER"
-
-  rm -rf "${ANYTLS_SNAP_DIR}"
-
-  chmod +x "$ANYTLS_SERVER"
-
-  print_info "正在创建/更新 systemd 服务文件: ${ANYTLS_SERVER} ..."
-
-  local port pass
-  port=$(read_port_interactive)
-  pass=$(gen_password)
-
-  write_systemd "$LATEST" "$port" "$pass"
-
-  write_config "$port" "$pass"
-
-  systemctl daemon-reload
-
-  if ! systemctl enable "${ANYTLS_SERVICE_NAME}"; then
-    print_info "设置开机自启失败"
-    exit 1
-  fi
-  if ! systemctl restart "${ANYTLS_SERVICE_NAME}"; then
-    print_error "启动/重启 AnyTLS 服务失败。请检查日志"
-    exit 1
-  fi
-  
-  sleep 2
-  if systemctl is-active --quiet "${ANYTLS_SERVICE_NAME}"; then
-    print_ok "AnyTLS 服务已成功启动"
-    echo -e "${OK} 安装完成，以下为客户端导入参数："
-    client_export
-    echo
-    exit 0
-  else
-    echo "错误: AnyTLS 服务未能成功启动。"; status_service; log_service -n 20;
-  fi
-}
-
-update_anytls() {
-  if ! is_installed; then
-    print_error "您还未安装 AnyTLS, 无法更新"
-    exit 1
-  fi
-  print_info "正在检测系统架构..."
-  ARCH=$(get_arch) || exit 1
-
-  echo -e "${INFO} 检测到系统架构: ${Green}${ARCH}${Font}"
-
-  LATEST=$(get_latest_version) || exit 1
-
-  sleep 1
-  print_info "正在下载AnyTLS..."
-
-  AT_URL="https://github.com/anytls/anytls-go/releases/download/${LATEST}/anytls_${LATEST#v}_linux_${ARCH}.zip"
-
-  print_info "AnyTLS最新版本 ${LATEST}"
-
-  if [ ! -d "$ANYTLS_SNAP_DIR" ];then
-    mkdir -p "$ANYTLS_SNAP_DIR"
-  fi
-
-  FILENAME="anytls_${LATEST}_darwin_${ARCH}.zip"
-  OUTPUT_PATH="${ANYTLS_SNAP_DIR}/${FILENAME}"
-
-  curl -L -o "$OUTPUT_PATH" "$AT_URL"
-
-  if [ $? -ne 0 ]; then
-    print_error "下载失败AnyTLS" >&2
-    exit 1
-  fi
-
-  judge "下载AnyTLS"
-  unzip -o "$OUTPUT_PATH" -d "$ANYTLS_SNAP_DIR"
-
-  mv "${ANYTLS_SNAP_DIR}/anytls-server" "$ANYTLS_SERVER"
-
-  rm -rf "${ANYTLS_SNAP_DIR}"
-
-  chmod +x "$ANYTLS_SERVER"
-
-  print_info "正在创建/更新 systemd 服务文件: ${ANYTLS_SERVER} ..."
-
-  local port pass
-  port=$(sed -nE 's/^[[:space:]]*listen:[[:space:]]*.*:([0-9]+)[[:space:]]*$/\1/p' "${ANYTLS_CONFIG_FILE}")
-  pass=$(sed -nE 's/^[[:space:]]*password:[[:space:]]*(.*)$/\1/p' "${ANYTLS_CONFIG_FILE}")
-
-  [[ -z "$port" ]] && port=$(random_port)
-  [[ -z "$pass" ]] && pass=$(gen_password)
-
-  write_systemd "$LATEST" "$port" "$pass"
-
-  write_config "$port" "$pass"
-
-  systemctl daemon-reload
-
-  if ! systemctl enable "${ANYTLS_SERVICE_NAME}"; then
-    print_info "设置开机自启失败"
-    exit 1
-  fi
-  if ! systemctl restart "${ANYTLS_SERVICE_NAME}"; then
-    print_error "启动/重启 AnyTLS 服务失败。请检查日志"
-    exit 1
-  fi
-  
-  sleep 2
-  if systemctl is-active --quiet "${ANYTLS_SERVICE_NAME}"; then
-    print_ok "AnyTLS 服务已成功启动"
-    echo -e "${OK} 更新完成，以下为客户端导入参数："
-    client_export
-    echo
-    exit 0
-  else
-    echo "错误: AnyTLS 服务未能成功启动。"; status_service; log_service -n 20;
-  fi
-}
-
-uninstall_anytls() {
-  if ! is_installed; then
-    print_error "您还未安装 AnyTLS, 无法卸载"
-    exit 1
-  fi
-  read -p "确认卸载并删除配置？(y/N): " ans
-  if [[ "${ans:-N}" != [yY] ]]; then
-    echo "已取消"
-    return
-  fi
-  systemctl stop "${ANYTLS_SERVICE_NAME}" || true
-  systemctl disable "${ANYTLS_SERVICE_NAME}" || true
-  rm -f /etc/systemd/system/${ANYTLS_SERVICE_NAME} || true
-  systemctl daemon-reload || true
-  rm -rf "${CONFIG_DIR}" || true
-  echo -e "${OK} 卸载完成。"
-}
-
-view_config() {
-  if ! is_installed; then
-    print_error "您还未安装 AnyTLS, 无法查看配置"
-    exit 1
-  fi
-  echo
-  echo -e "以下为客户端导入参数："
-  client_export
-  echo
-  exit 0
-}
-
-set_port() {
-  if ! is_installed; then
-    print_error "您还未安装 AnyTLS, 无法设置端口"
-    exit 1
-  fi
-  local new_port
-  new_port=$(read_port_interactive)
-  local pass
-  pass=$(sed -nE 's/^[[:space:]]*password:[[:space:]]*(.*)$/\1/p' "${ANYTLS_CONFIG_FILE}")
-  write_systemd "" "$new_port" "$pass"
-  write_config "$new_port" "$pass"
-  restart_service
-  clear
-  echo -e "${OK} 端口已更新为：${new_port}"
-  echo
-  echo -e "${INFO} 当前客户端导入参数："
-  echo
-  client_export
-  echo
-  exit 0
-}
-
-set_password() {
-  if ! is_installed; then
-    print_error "您还未安装 AnyTLS, 无法设置端口"
-    exit 1
-  fi
-  local new_pass
-  new_pass=$(gen_password)
-  local port
-  port=$(sed -nE 's/^[[:space:]]*listen:[[:space:]]*.*:([0-9]+)[[:space:]]*$/\1/p' "${ANYTLS_CONFIG_FILE}")
-  write_systemd "" "$port" "$new_pass"
-  write_config "$port" "$new_pass"
-  restart_service
-  clear
-  echo -e "${OK} 密码已更新为：${new_pass}"
-  echo
-  echo -e "${INFO} 当前客户端导入参数："
-  echo
-  client_export
-  echo
-  exit 0
-}
-
-installgo() {
-
-    
-    # 下载并安装 Go
-    wget https://go.dev/dl/go1.25.2.linux-amd64.tar.gz
-    tar -zxvf go1.25.2.linux-amd64.tar.gz -C /usr/local/
-    ln -s /usr/local/go/bin/go /usr/bin/go
-
-    # 配置环境变量
-    cat >> /etc/profile <<EOF
-export GOROOT=/usr/local/go
-export GOBIN=\$GOROOT/bin
-export PATH=\$PATH:\$GOBIN
-export GOPATH=/home/gopath
+[Install]
+WantedBy=multi-user.target
 EOF
-    
-    mkdir -p /home/gopath
-    source /etc/profile
-    go version
+
+    systemctl daemon-reload
+    systemctl enable anytls-sub
+    systemctl restart anytls-sub
+    sleep 1
+
+    if systemctl is-active --quiet anytls-sub; then
+        log_info "订阅 HTTP 服务已启动，端口: $SUB_HTTP_PORT"
+    else
+        log_error "订阅 HTTP 服务启动失败，请检查日志: journalctl -u anytls-sub -n 50"
+        exit 1
+    fi
+}
+
+# ---------- 生成订阅内容 ----------
+generate_subscription() {
+    local port=$(grep ANYTLS_PORT "$CONFIG_FILE" | cut -d= -f2)
+    local password=$(grep ANYTLS_PASSWORD "$CONFIG_FILE" | cut -d= -f2)
+    local ip=$(curl -s4 ifconfig.me 2>/dev/null || curl -s4 ip.sb 2>/dev/null || echo "YOUR_SERVER_IP")
+
+    mkdir -p "$SUB_DIR"
+
+    # AnyTLS URI 格式参考: anytls://[auth@]hostname[:port]/?
+    local node_name="AnyTLS-$(date +%m%d)"
+    local uri="anytls://${password}@${ip}:${port}/#${node_name}"
+
+    # 生成纯文本订阅 (每行一个 URI)
+    echo "$uri" > "$SUB_DIR/subscription-123.txt"
+
+    # 生成 Base64 编码订阅 (部分客户端需要)
+    base64 -w0 "$SUB_DIR/subscription-123.txt" > "$SUB_DIR/subscription_base64.txt"
+
+    log_info "订阅已生成:"
+    log_info "  明文地址: http://${ip}:${SUB_HTTP_PORT}/subscription-123.txt"
+    log_info "  Base64地址: http://${ip}:${SUB_HTTP_PORT}/subscription_base64.txt"
+    log_info "  节点 URI: $uri"
+}
+
+# ---------- 创建每日轮换脚本 ----------
+create_rotate_script() {
+    cat > "$CRON_SCRIPT" << 'ROTATE_EOF'
+#!/bin/bash
+# AnyTLS 每日端口轮换脚本
+
+CONFIG_FILE="/etc/anytls/config.env"
+SERVICE_FILE="/etc/systemd/system/anytls.service"
+SUB_DIR="/var/www/anytls-sub"
+ANYTLS_BIN="/usr/local/bin/anytls-server"
+SUB_HTTP_PORT=9119
+
+# 读取旧密码（保持密码不变，仅换端口）
+OLD_PASSWORD=$(grep ANYTLS_PASSWORD "$CONFIG_FILE" | cut -d= -f2)
+NEW_PORT=$(shuf -i 10000-65000 -n 1)
+
+# 更新配置
+cat > "$CONFIG_FILE" << EOF
+ANYTLS_PORT=$NEW_PORT
+ANYTLS_PASSWORD=$OLD_PASSWORD
+EOF
+chmod 600 "$CONFIG_FILE"
+
+# 更新 systemd 服务
+cat > "$SERVICE_FILE" << EOF
+[Unit]
+Description=AnyTLS Server
+After=network.target
+
+[Service]
+Type=simple
+User=root
+ExecStart=$ANYTLS_BIN -l 0.0.0.0:$NEW_PORT -p $OLD_PASSWORD
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+systemctl daemon-reload
+systemctl restart anytls
+
+# 重新生成订阅
+IP=$(curl -s4 ifconfig.me 2>/dev/null || curl -s4 ip.sb 2>/dev/null || echo "YOUR_SERVER_IP")
+mkdir -p "$SUB_DIR"
+NODE_NAME="AnyTLS-$(date +%m%d)"
+URI="anytls://${OLD_PASSWORD}@${IP}:${NEW_PORT}/#${NODE_NAME}"
+
+echo "$URI" > "$SUB_DIR/subscription-123.txt"
+base64 -w0 "$SUB_DIR/subscription-123.txt" > "$SUB_DIR/subscription_base64.txt"
+
+# 订阅 HTTP 服务由 systemd 管理，只需重启以确保状态
+systemctl restart anytls-sub
+
+logger "AnyTLS: 端口已更换为 $NEW_PORT，订阅已更新"
+ROTATE_EOF
+
+    chmod +x "$CRON_SCRIPT"
+}
+
+# ---------- 设置 cron 任务 ----------
+setup_cron() {
+    local cron_line="0 2 * * * $CRON_SCRIPT"
+
+    # 移除旧任务（如果有）
+    crontab -l 2>/dev/null | grep -v "anytls-rotate.sh" | crontab - 2>/dev/null || true
+
+    # 添加新任务
+    (crontab -l 2>/dev/null; echo "$cron_line") | crontab -
+    log_info "Cron 任务已设置: 每天凌晨 2:00 自动更换端口并更新订阅"
+}
+
+# ---------- 显示信息 ----------
+show_info() {
+    local port=$(grep ANYTLS_PORT "$CONFIG_FILE" | cut -d= -f2)
+    local password=$(grep ANYTLS_PASSWORD "$CONFIG_FILE" | cut -d= -f2)
+    local ip=$(curl -s4 ifconfig.me 2>/dev/null || curl -s4 ip.sb 2>/dev/null || echo "YOUR_SERVER_IP")
+
+    echo ""
+    echo "=========================================="
+    echo -e "${GREEN}  AnyTLS-Go 安装完成！${NC}"
+    echo "=========================================="
+    echo ""
+    echo "  服务器 IP:    $ip"
+    echo "  端口:         $port"
+    echo "  密码:         $password"
+    echo ""
+    echo "  订阅地址 (明文):"
+    echo "    http://${ip}:${SUB_HTTP_PORT}/subscription-123.txt"
+    echo ""
+    echo "  订阅地址 (Base64):"
+    echo "    http://${ip}:${SUB_HTTP_PORT}/subscription_base64.txt"
+    echo ""
+    echo "  节点 URI:"
+    echo "    anytls://${password}@${ip}:${port}/"
+    echo ""
+    echo "  服务管理:"
+    echo "    systemctl status anytls"
+    echo "    systemctl restart anytls"
+    echo "    journalctl -u anytls -f"
+    echo ""
+    echo "    systemctl status anytls-sub"
+    echo "    systemctl restart anytls-sub"
+    echo "    journalctl -u anytls-sub -f"
+    echo ""
+    echo "  每日轮换脚本: $CRON_SCRIPT"
+    echo "  配置文件:     $CONFIG_FILE"
+    echo "  订阅目录:     $SUB_DIR"
+    echo ""
+    echo -e "${YELLOW}  注意: 请确保防火墙已放行端口 $port (TCP) 和 $SUB_HTTP_PORT (TCP)${NC}"
+    echo ""
+}
+
+# ---------- 卸载 ----------
+uninstall() {
+    echo ""
+    log_warn "即将卸载 AnyTLS-Go 及其所有配置、订阅、定时任务"
+    read -r -p "确认卸载? [y/N] " confirm
+    if [[ ! "$confirm" =~ ^[Yy]$ ]]; then
+        log_info "已取消卸载"
+        exit 0
+    fi
+
+    echo ""
+    log_info "开始卸载..."
+
+    # 1. 停止并禁用 anytls 服务
+    if systemctl list-unit-files | grep -q "^anytls.service"; then
+        systemctl stop anytls 2>/dev/null || true
+        systemctl disable anytls 2>/dev/null || true
+        log_info "已停止并禁用 anytls 服务"
+    fi
+
+    # 2. 停止并禁用 anytls-sub 服务
+    if systemctl list-unit-files | grep -q "^anytls-sub.service"; then
+        systemctl stop anytls-sub 2>/dev/null || true
+        systemctl disable anytls-sub 2>/dev/null || true
+        log_info "已停止并禁用 anytls-sub 服务"
+    fi
+
+    # 3. 删除 systemd 服务文件
+    if [[ -f "$SERVICE_FILE" ]]; then
+        rm -f "$SERVICE_FILE"
+        log_info "已删除 systemd 服务文件: $SERVICE_FILE"
+    fi
+    if [[ -f "$SUB_SERVICE_FILE" ]]; then
+        rm -f "$SUB_SERVICE_FILE"
+        log_info "已删除 systemd 服务文件: $SUB_SERVICE_FILE"
+    fi
+    systemctl daemon-reload
+    systemctl reset-failed 2>/dev/null || true
+
+    # 4. 删除二进制文件
+    if [[ -f "$ANYTLS_BIN" ]]; then
+        rm -f "$ANYTLS_BIN"
+        log_info "已删除二进制: $ANYTLS_BIN"
+    fi
+
+    # 5. 删除订阅目录
+    if [[ -d "$SUB_DIR" ]]; then
+        rm -rf "$SUB_DIR"
+        log_info "已删除订阅目录: $SUB_DIR"
+    fi
+
+    # 6. 删除配置目录
+    if [[ -d "/etc/anytls" ]]; then
+        rm -rf "/etc/anytls"
+        log_info "已删除配置目录: /etc/anytls"
+    fi
+
+    # 7. 删除轮换脚本
+    if [[ -f "$CRON_SCRIPT" ]]; then
+        rm -f "$CRON_SCRIPT"
+        log_info "已删除轮换脚本: $CRON_SCRIPT"
+    fi
+
+    # 8. 移除 cron 任务
+    if crontab -l 2>/dev/null | grep -q "anytls-rotate.sh"; then
+        crontab -l 2>/dev/null | grep -v "anytls-rotate.sh" | crontab - 2>/dev/null || true
+        log_info "已移除 cron 定时任务"
+    fi
+
+    # 9. 清理可能的残留进程
+    pkill -f "anytls-server" 2>/dev/null || true
+    pkill -f "${CRON_SCRIPT}" 2>/dev/null || true
+    pkill -f "http.server ${SUB_HTTP_PORT}" 2>/dev/null || true
+
+    echo ""
+    echo "=========================================="
+    echo -e "${GREEN}  AnyTLS-Go 卸载完成！${NC}"
+    echo "=========================================="
+    echo ""
+    echo -e "${YELLOW}  说明:${NC}"
+    echo "    - wget/unzip/curl/cron/python3 等依赖未卸载（可能被系统其他程序使用）"
+    echo "    - 如需清理依赖，请手动执行: apt-get remove wget unzip curl cron python3"
+    echo "    - 本脚本文件 $(realpath "$0" 2>/dev/null || echo "$0") 未自动删除，如需可手动删除"
+    echo ""
     exit 0
 }
 
-buildanytls() {
-cd /tmp
-rm -rf anytls-go
-git clone "https://github.com/anytls/anytls-go.git"
-cd anytls-go
-
-# 编译服务端和客户端
-CGO_ENABLED=0  GOOS=linux  GOARCH=amd64 go build -o anytls-server ./cmd/server
-CGO_ENABLED=0  GOOS=linux  GOARCH=amd64 go build -o anytls-client ./cmd/client
-rm /etc/anytls/server
-cp anytls-server /etc/anytls/
-cp anytls-server /etc/anytls/server
-  exit 0
-}
-
-echo_version() {
-  if ! is_installed; then
-    return 0
-  fi
-  echo -e " 当前AnyTLS版本: $(get_install_version)"
-}
-
+# ---------- 主流程 ----------
 main() {
-  while true; do
-    clear
-    hr
-    echo -e " AnyTLS 一键脚本"
-    echo -e " 当前脚本版本: ${Magenta}${SHELL_VERSION}${Font}"
-    echo -e " 安装状态：$(install_status_text)"
-    echo_version
-    hr
-    echo -e "${Cyan}1. 安装/重装 AnyTLS${Font}"
-    echo -e "${Cyan}2. 更新 AnyTLS${Font}"
-    echo -e "${Cyan}3. 查看配置${Font}"
-    echo -e "${Cyan}4. 卸载 AnyTLS${Font}"
-    echo -e "${Cyan}5. 更改端口${Font}"
-    echo -e "${Cyan}6. 更改密码${Font}"
-    echo -e "${Cyan}7. 安装go${Font}"
-    echo -e "${Cyan}8. 编译anytls${Font}"
-    echo -e "${Cyan}0. 退出${Font}"
-    hr
-      read -p "请输入数字 [0-6]: " choice
-    case "${choice}" in
-      1) install_anytls; quit ;;
-      2) update_anytls; quit ;;
-      3) view_config; quit ;;
-      4) uninstall_anytls; quit ;;
-      5) set_port; quit ;;
-      6) set_password; quit ;;
-      7) installgo; quit ;;
-      8) buildanytls; quit ;;
-      0) exit 0 ;;
-      *) echo "无效选项"; pause ;;
+    # 参数解析
+    case "${1:-}" in
+        uninstall|remove|-u|--uninstall)
+            uninstall
+            ;;
+        "")
+            # 无参数则正常安装
+            ;;
+        *)
+            echo "用法: $0 [uninstall]"
+            echo ""
+            echo "  无参数       安装 AnyTLS-Go 并配置订阅和每日轮换"
+            echo "  uninstall    卸载 AnyTLS-Go 及其所有配置"
+            echo ""
+            exit 1
+            ;;
     esac
-  done
+
+    echo "=========================================="
+    echo "  AnyTLS-Go 自动安装 + 订阅 + 每日轮换"
+    echo "=========================================="
+    echo ""
+
+    install_deps
+    download_anytls
+    generate_config
+    create_service
+    create_sub_service
+    generate_subscription
+    create_rotate_script
+    setup_cron
+    show_info
 }
 
-ensure_root
-main
+main "$@"
