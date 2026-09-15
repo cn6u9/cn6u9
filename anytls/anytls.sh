@@ -211,7 +211,8 @@ generate_subscription() {
 
     # AnyTLS URI 格式参考: anytls://[auth@]hostname[:port]/?
     local node_name="AnyTLS-$(date +%m%d)"
-    local uri="anytls://${password}@${ip}:${port}/#${node_name}"
+    #local uri="anytls://${password}@${ip}:${port}/#${node_name}"
+    local uri="anytls://${password}@${ip}:${port}/?allowInsecure=1#${node_name}"
 
     # 生成纯文本订阅 (每行一个 URI)
     echo "$uri" > "$SUB_DIR/subscription-123.txt"
@@ -272,7 +273,8 @@ systemctl restart anytls
 IP=$(curl -s4 ifconfig.me 2>/dev/null || curl -s4 ip.sb 2>/dev/null || echo "YOUR_SERVER_IP")
 mkdir -p "$SUB_DIR"
 NODE_NAME="AnyTLS-$(date +%m%d)"
-URI="anytls://${OLD_PASSWORD}@${IP}:${NEW_PORT}/#${NODE_NAME}"
+#URI="anytls://${OLD_PASSWORD}@${IP}:${NEW_PORT}/#${NODE_NAME}"
+URI="anytls://${OLD_PASSWORD}@${IP}:${NEW_PORT}/?allowInsecure=1#${NODE_NAME}"
 
 echo "$URI" > "$SUB_DIR/subscription-123.txt"
 base64 -w0 "$SUB_DIR/subscription-123.txt" > "$SUB_DIR/subscription_base64.txt"
